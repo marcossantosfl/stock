@@ -321,14 +321,6 @@ export default function DashBoard() {
     }
   };
 
-  const handleClick = (index) => {
-    if (isSingleClick) {
-      handleStockUpdate1(index, 'subtract');
-    }
-
-    setIsSingleClick(false);
-  };
-
   const handleLongPress = () => {
     if (number < 9) {
       setNumber(number + 1);
@@ -526,7 +518,7 @@ export default function DashBoard() {
                           borderRadius="50%"
                           isDisabled={isLoadingButtons1[index] || stock.amount == 0}
                           isLoading={isLoadingButtons1[index]}
-                          onClick={() => handleClick(index)}
+                          onClick={() => handleStockUpdate1(index, 'subtract')}
                           bg={bgIconButton}
                           _hover={bgIconHover}
                           _active={bgIconFocus}
@@ -578,10 +570,7 @@ export default function DashBoard() {
                           borderRadius="50%"
                           isDisabled={isLoadingButtons2[index]}
                           isLoading={isLoadingButtons2[index]}
-                          onDoubleClick={() => handleStockUpdate2(index, 'add')}
-                          onClick={() => {
-
-                          }}
+                          onClick={() => handleStockUpdate2(index, 'add')}
                           bg={bgIconButton}
                           _hover={bgIconHover}
                           _active={bgIconFocus}
