@@ -61,7 +61,7 @@ export default function NewUser() {
       router.push('/home');
     }
 
-  }, [userId]);
+  }, [userId, token]);
 
   useEffect(() => {
     const storedStocks = localStorage.getItem("stocks");
@@ -134,7 +134,7 @@ export default function NewUser() {
     }
 
     try {
-      const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks", {
+      const response = await fetch("http://localhost:8080/api/auth/stocks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

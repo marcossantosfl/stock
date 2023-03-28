@@ -118,6 +118,7 @@ function ForgotPassword() {
       const data = await response.json();
 
       localStorage.setItem("accessToken", JSON.stringify(data.accessToken))
+
       // do something with the response data
       setTimeout(() => {
         router.push("/user/new-user");
