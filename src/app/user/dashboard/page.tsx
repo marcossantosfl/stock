@@ -37,6 +37,7 @@ import {
 import React, { useEffect, useState, useMemo } from 'react';
 import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
 import { MdExposureNeg1, MdAdd, MdOutlineEuroSymbol, MdOutlineEuro } from 'react-icons/md';
+import { RiNumber1,RiNumber2,RiNumber3,RiNumber4,RiNumber5,RiNumber6,RiNumber7,RiNumber8,RiNumber9 } from "react-icons/ri";
 import Card from 'components/card/Card';
 import axios from 'axios';
 import MiniStatistics from 'components/card/MiniStatistics';
@@ -84,7 +85,6 @@ export default function DashBoard() {
   useEffect(() => {
     setTimeout(() => {
     setIsLoading(true);
-
     if(token == null)
     {
       localStorage.clear();
@@ -104,13 +104,11 @@ export default function DashBoard() {
       .catch(err => {
         console.error(err);
       });
-    }, 1000);
+    }, 2000);
   }, [userId]);
 
   useEffect(() => {
     setTimeout(() => {
-
-    
     const fetchBill = async () => {
       try {
         const headers = {
@@ -131,7 +129,7 @@ export default function DashBoard() {
     };
   
     fetchBill();
-  }, 1000);
+  }, 2000);
   }, [isLoadingMarkAsDelivered]);
   
 
@@ -469,7 +467,7 @@ export default function DashBoard() {
                             h="56px"
                             mb="5px"
                             boxShadow={shadow}
-                            icon={<Icon as={MdExposureNeg1} color={yellowIcon} w="24px" h="24px" />}
+                            icon={<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />}
                           />
                           <Text fontSize="sm" fontWeight="500" color={textColor}>
                             Subtract -1
@@ -523,7 +521,7 @@ export default function DashBoard() {
                             h="56px"
                             mb="5px"
                             boxShadow={shadow}
-                            icon={<Icon as={MdAdd} color={yellowIcon} w="24px" h="24px" />}
+                            icon={<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />}
                           />
                           <Text fontSize="sm" fontWeight="500" color={textColor}>
                             Top Up
