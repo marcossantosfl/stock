@@ -30,6 +30,13 @@ export default function AuthNavbar(props: {
 }) {
   const { logoText, sidebarWidth } = props;
 
+  const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
+
+  const handleLogout = () => {
+    localStorage.clear();
+    window.location.href = "/home";
+  };
+
   let logoColor = useColorModeValue('white', 'white');
   // Chakra color mode
 
@@ -84,6 +91,7 @@ export default function AuthNavbar(props: {
   
   const linksAuth = (
     <HStack display={{ sm: 'none', lg: 'flex' }} spacing="20px">
+      {!userId && (
       <Stack
         direction="row"
         spacing="4px"
@@ -102,6 +110,24 @@ export default function AuthNavbar(props: {
         </Text>
         </Link>
       </Stack>
+       )}
+      {userId && (
+      <Stack
+        direction="row"
+        spacing="4px"
+        alignItems="center"
+        color="#fff"
+        fontWeight="bold"
+        cursor="pointer"
+        position="relative"
+      >
+        <Link href="#" onClick={handleLogout} style={{ maxWidth: 'max-content' }}>
+          <Text fontSize="sm" color={mainText}>
+            Logout
+          </Text>
+        </Link>
+      </Stack>
+    )}
     </HStack>
   );
 
@@ -134,6 +160,7 @@ export default function AuthNavbar(props: {
             <SidebarResponsive routes={routes} />
           </Box>
           {linksAuth}
+          {!userId && (
           <Link href="/auth/sign-up/centered">
             <Button
               bg={bgButton}
@@ -150,6 +177,7 @@ export default function AuthNavbar(props: {
               Register Now
             </Button>
           </Link>
+          )}
         </Flex>
       </Flex>
     </SidebarContext.Provider>
