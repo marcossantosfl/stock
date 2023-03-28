@@ -323,12 +323,14 @@ export default function DashBoard() {
           cardSx={{ bg: 'none' }}
         >
           <Flex
-            direction="column"
-
-            align="center"
+            w="100%"
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            h="100%"
             justifyContent="center"
-            pt={{ sm: '125px', lg: '75px' }}
-            position="relative"
+            px={{ base: '25px', md: '0px' }}
+            flexDirection="column"
           >
             <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
             <Text mb="36px"
