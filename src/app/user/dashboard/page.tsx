@@ -82,7 +82,7 @@ export default function DashBoard() {
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
-  
+  const [icon, setIcon] = useState(<Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />);
 
   useEffect(() => {
     setTimeout(() => {
@@ -333,283 +333,283 @@ export default function DashBoard() {
     } else {
       setNumber(1);
     }
-  };
 
-  let icon;
-  switch (number) {
-    case 1:
-      icon = <Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />;
-      break;
-    case 2:
-      icon = <Icon as={RiNumber2} color={yellowIcon} w="24px" h="24px" />;
-      break;
-    case 3:
-      icon = <Icon as={RiNumber3} color={yellowIcon} w="24px" h="24px" />;
-      break;
-    case 4:
-      icon = <Icon as={RiNumber4} color={yellowIcon} w="24px" h="24px" />;
-      break;
-    case 5:
-      icon = <Icon as={RiNumber5} color={yellowIcon} w="24px" h="24px" />;
-      break;
-    case 6:
-      icon = <Icon as={RiNumber6} color={yellowIcon} w="24px" h="24px" />;
-      break;
-    case 7:
-      icon = <Icon as={RiNumber7} color={yellowIcon} w="24px" h="24px" />;
-      break;
-    case 8:
-      icon = <Icon as={RiNumber8} color={yellowIcon} w="24px" h="24px" />;
-      break;
-    case 9:
-      icon = <Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />;
-      break;
-    default:
-      icon = null;
+    let icon;
+    switch (number) {
+      case 1:
+        setIcon(<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />);
+        break;
+      case 2:
+        setIcon(<Icon as={RiNumber2} color={yellowIcon} w="24px" h="24px" />);
+        break;
+      case 3:
+        setIcon(<Icon as={RiNumber3} color={yellowIcon} w="24px" h="24px" />);
+        break;
+      case 4:
+        setIcon(<Icon as={RiNumber4} color={yellowIcon} w="24px" h="24px" />);
+        break;
+      case 5:
+        setIcon(<Icon as={RiNumber5} color={yellowIcon} w="24px" h="24px" />);
+        break;
+      case 6:
+        setIcon(<Icon as={RiNumber6} color={yellowIcon} w="24px" h="24px" />);
+        break;
+      case 7:
+        setIcon(<Icon as={RiNumber7} color={yellowIcon} w="24px" h="24px" />);
+        break;
+      case 8:
+        setIcon(<Icon as={RiNumber8} color={yellowIcon} w="24px" h="24px" />);
+        break;
+      case 9:
+        setIcon(<Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />);
+        break;
+      default:
+        icon = null;
+    }
   }
 
-    return (
-      <>
-        {isLoading ? (
-          <CenteredAuth
-            image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
-            cardTop={{ base: '140px', md: '14vh' }}
-            cardBottom={{ base: '50px', lg: '100px' }}
-            showCard={true}
-            cardSx={{ bg: 'none' }}
+  return (
+    <>
+      {isLoading ? (
+        <CenteredAuth
+          image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+          cardTop={{ base: '140px', md: '14vh' }}
+          cardBottom={{ base: '50px', lg: '100px' }}
+          showCard={true}
+          cardSx={{ bg: 'none' }}
+        >
+          <Flex
+            w="100%"
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            h="100%"
+            justifyContent="center"
+            px={{ base: '25px', md: '0px' }}
+            flexDirection="column"
           >
-            <Flex
-              w="100%"
-              maxW="max-content"
-              mx={{ base: 'auto', lg: '0px' }}
-              me="auto"
-              h="100%"
-              justifyContent="center"
-              px={{ base: '25px', md: '0px' }}
-              flexDirection="column"
-            >
-              <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
-              <Text mb="36px"
-                ms="4px"
-                color="white"
-                fontWeight="400"
-                fontSize="lg" textAlign='center'>
-                Loading...
-              </Text>
-            </Flex>
-          </CenteredAuth>
-        ) : (
-          <CenteredAuth
-            image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
-            cardTop={{ base: '140px', md: '24vh' }}
-            cardBottom={{ base: '50px', lg: 'auto' }}
-            showCard={true}
-            {...swipeHandlers}
+            <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
+            <Text mb="36px"
+              ms="4px"
+              color="white"
+              fontWeight="400"
+              fontSize="lg" textAlign='center'>
+              Loading...
+            </Text>
+          </Flex>
+        </CenteredAuth>
+      ) : (
+        <CenteredAuth
+          image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+          cardTop={{ base: '140px', md: '24vh' }}
+          cardBottom={{ base: '50px', lg: 'auto' }}
+          showCard={true}
+          {...swipeHandlers}
+        >
+          <Flex
+            w="100%"
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            h="100%"
+            justifyContent="center"
+            px={{ base: '25px', md: '0px' }}
+            flexDirection="column"
           >
-            <Flex
-              w="100%"
-              maxW="max-content"
-              mx={{ base: 'auto', lg: '0px' }}
-              me="auto"
-              h="100%"
-              justifyContent="center"
-              px={{ base: '25px', md: '0px' }}
-              flexDirection="column"
-            >
-              <Card p="30px">
-                <SimpleGrid row={4} gap="10px" mb="10px" alignItems="center" alignContent="center" justifyContent="center" justifyItems="center">
-                  {showEarnings && bill !== null && (
-                    <MiniStatistics
-                      startContent={
-                        <IconBox
-                          w="56px"
-                          h="56px"
-                          bg={boxBg}
-                          icon={
-                            <Icon
-                              w="32px"
-                              h="32px"
-                              as={MdOutlineEuroSymbol}
-                              color={brandColor}
-                            />
-                          }
-                        />
-                      }
-                      name="Your Earnings"
-                      value={`€${bill.earn}`}
-                    />
-                  )}
-                  {showToPay && bill !== null && (
-                    <MiniStatistics
-                      startContent={
-                        <IconBox
-                          w="56px"
-                          h="56px"
-                          bg={boxBg}
-                          icon={
-                            <Icon
-                              w="32px"
-                              h="32px"
-                              as={MdOutlineEuroSymbol}
-                              color={brandColor}
-                            />
-                          }
-                        />
-                      }
-                      name="To Pay"
-                      value={`€${bill.toPayTotal}`}
-                    />
-                  )}
-
-                  <SimpleGrid columns={2} gap="20px">
-                    <Box onClick={() => setShowEarnings(!showEarnings)}>
-                      <Controller
-                        initial={true}
-                        text="Show My Earnings"
-                        onValue="ON"
-                        offValue="OFF"
-                        icon={MdOutlineEuroSymbol}
+            <Card p="30px">
+              <SimpleGrid row={4} gap="10px" mb="10px" alignItems="center" alignContent="center" justifyContent="center" justifyItems="center">
+                {showEarnings && bill !== null && (
+                  <MiniStatistics
+                    startContent={
+                      <IconBox
+                        w="56px"
+                        h="56px"
+                        bg={boxBg}
+                        icon={
+                          <Icon
+                            w="32px"
+                            h="32px"
+                            as={MdOutlineEuroSymbol}
+                            color={brandColor}
+                          />
+                        }
                       />
-                    </Box>
-                    <Box onClick={() => setToPay(!showToPay)}>
-                      <Controller
-                        initial={true}
-                        text="Show To Pay"
-                        onValue="ON"
-                        offValue="OFF"
-                        icon={MdOutlineEuro}
-                      />
-                    </Box>
-                  </SimpleGrid>
-                </SimpleGrid>
-                {showMarkAsDelivered && (
-                  <Button
-                    isLoading={isLoadingMarkAsDelivered}
-                    //isDisabled={isLoadingMarkAsDelivered}
-                    mb="10px"
-                    mt="10px"
-                    onClick={() => handleMarkAsDelivered()}
-                    variant="brand"
-                    fontSize="14px"
-                    fontWeight="500"
-                    w="100%"
-                    h="50"
-                  >
-                    Mark as delivered
-                  </Button>
+                    }
+                    name="Your Earnings"
+                    value={`€${bill.earn}`}
+                  />
                 )}
-                <SimpleGrid columns={3} gap="30px" alignItems="center" justifyContent="center" textAlign="center">
-                  {Array.isArray(stocks) &&
-                    stocks.map((stock, index) => (
-                      <React.Fragment key={index}>
-                        <Flex
-                          direction="column"
+                {showToPay && bill !== null && (
+                  <MiniStatistics
+                    startContent={
+                      <IconBox
+                        w="56px"
+                        h="56px"
+                        bg={boxBg}
+                        icon={
+                          <Icon
+                            w="32px"
+                            h="32px"
+                            as={MdOutlineEuroSymbol}
+                            color={brandColor}
+                          />
+                        }
+                      />
+                    }
+                    name="To Pay"
+                    value={`€${bill.toPayTotal}`}
+                  />
+                )}
+
+                <SimpleGrid columns={2} gap="20px">
+                  <Box onClick={() => setShowEarnings(!showEarnings)}>
+                    <Controller
+                      initial={true}
+                      text="Show My Earnings"
+                      onValue="ON"
+                      offValue="OFF"
+                      icon={MdOutlineEuroSymbol}
+                    />
+                  </Box>
+                  <Box onClick={() => setToPay(!showToPay)}>
+                    <Controller
+                      initial={true}
+                      text="Show To Pay"
+                      onValue="ON"
+                      offValue="OFF"
+                      icon={MdOutlineEuro}
+                    />
+                  </Box>
+                </SimpleGrid>
+              </SimpleGrid>
+              {showMarkAsDelivered && (
+                <Button
+                  isLoading={isLoadingMarkAsDelivered}
+                  //isDisabled={isLoadingMarkAsDelivered}
+                  mb="10px"
+                  mt="10px"
+                  onClick={() => handleMarkAsDelivered()}
+                  variant="brand"
+                  fontSize="14px"
+                  fontWeight="500"
+                  w="100%"
+                  h="50"
+                >
+                  Mark as delivered
+                </Button>
+              )}
+              <SimpleGrid columns={3} gap="30px" alignItems="center" justifyContent="center" textAlign="center">
+                {Array.isArray(stocks) &&
+                  stocks.map((stock, index) => (
+                    <React.Fragment key={index}>
+                      <Flex
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        textAlign="center"
+                        me={{ base: '22px', '2xl': '36px' }}
+                      >
+                        <IconButton
                           alignItems="center"
                           justifyContent="center"
                           textAlign="center"
-                          me={{ base: '22px', '2xl': '36px' }}
-                        >
-                          <IconButton
-                            alignItems="center"
-                            justifyContent="center"
-                            textAlign="center"
-                            aria-label="Top"
-                            borderRadius="50%"
-                            isDisabled={isLoadingButtons1[index] || stock.amount == 0}
-                            isLoading={isLoadingButtons1[index]}
-                            onClick={() => handleClick(index)}
-                            bg={bgIconButton}
-                            _hover={bgIconHover}
-                            _active={bgIconFocus}
-                            _focus={bgIconFocus}
-                            w="56px"
-                            h="56px"
-                            mb="5px"
-                            boxShadow={shadow}
-                            icon={icon}
-                            onDoubleClick={() => handleDoubleClick()}
-                          />
-                          <Text fontSize="sm" fontWeight="500" color={textColor}>
-                            Subtract -1
-                          </Text>
-                        </Flex>
-                        <Flex
-                          direction="column"
+                          aria-label="Top"
+                          borderRadius="50%"
+                          isDisabled={isLoadingButtons1[index] || stock.amount == 0}
+                          isLoading={isLoadingButtons1[index]}
+                          onClick={() => handleClick(index)}
+                          bg={bgIconButton}
+                          _hover={bgIconHover}
+                          _active={bgIconFocus}
+                          _focus={bgIconFocus}
+                          w="56px"
+                          h="56px"
+                          mb="5px"
+                          boxShadow={shadow}
+                          icon={icon}
+                          onDoubleClick={() => handleDoubleClick()}
+                        />
+                        <Text fontSize="sm" fontWeight="500" color={textColor}>
+                          Subtract -1
+                        </Text>
+                      </Flex>
+                      <Flex
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        textAlign="center"
+                        me={{ base: '22px', '2xl': '36px' }}
+                      >
+                        <Text color={textColor} fontSize="24px" fontWeight="700">
+                          €{stock.amount * stock.value}
+                        </Text>
+                        <Text
                           alignItems="center"
                           justifyContent="center"
                           textAlign="center"
-                          me={{ base: '22px', '2xl': '36px' }}
+                          w="max-content"
+                          mb="10px"
+                          fontSize="md"
+                          p="6px 12px"
+                          bg="linear-gradient(108.54deg, #FF416C 6.56%, #FF4B2B 95.2%)"
+                          color="white"
+                          borderRadius="10px"
+                          fontWeight="700"
                         >
-                          <Text color={textColor} fontSize="24px" fontWeight="700">
-                            €{stock.amount * stock.value}
-                          </Text>
-                          <Text
-                            alignItems="center"
-                            justifyContent="center"
-                            textAlign="center"
-                            w="max-content"
-                            mb="10px"
-                            fontSize="md"
-                            p="6px 12px"
-                            bg="linear-gradient(108.54deg, #FF416C 6.56%, #FF4B2B 95.2%)"
-                            color="white"
-                            borderRadius="10px"
-                            fontWeight="700"
-                          >
-                            {stock.name}
-                          </Text>
-                        </Flex>
-                        <Flex
-                          direction="column"
-                          align="center"
-                          me={{ base: '22px', '2xl': '36px' }}
-                        >
-                          <IconButton
-                            aria-label="Top"
-                            borderRadius="50%"
-                            isDisabled={isLoadingButtons2[index]}
-                            isLoading={isLoadingButtons2[index]}
-                            onDoubleClick={() => handleStockUpdate2(index, 'add')}
-                            onClick={() => {
+                          {stock.name}
+                        </Text>
+                      </Flex>
+                      <Flex
+                        direction="column"
+                        align="center"
+                        me={{ base: '22px', '2xl': '36px' }}
+                      >
+                        <IconButton
+                          aria-label="Top"
+                          borderRadius="50%"
+                          isDisabled={isLoadingButtons2[index]}
+                          isLoading={isLoadingButtons2[index]}
+                          onDoubleClick={() => handleStockUpdate2(index, 'add')}
+                          onClick={() => {
 
-                            }}
-                            bg={bgIconButton}
-                            _hover={bgIconHover}
-                            _active={bgIconFocus}
-                            _focus={bgIconFocus}
-                            w="56px"
-                            h="56px"
-                            mb="5px"
-                            boxShadow={shadow}
-                            icon={<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />}
-                          />
-                          <Text fontSize="sm" fontWeight="500" color={textColor}>
-                            Top Up
-                          </Text>
-                        </Flex>
-                      </React.Fragment>
-                    ))}
-                </SimpleGrid>
-                {showReset && (
-                  <Button
-                    isLoading={isLoadingReset}
-                    //isDisabled={isLoadingReset}
-                    mb="10px"
-                    mt="20px"
-                    onClick={() => handleEndDay()}
-                    variant="brand"
-                    fontSize="14px"
-                    fontWeight="500"
-                    w="100%"
-                    h="50"
-                  >
-                    CLOSE STOCK.
-                  </Button>
-                )}
-              </Card>
-            </Flex>
-          </CenteredAuth>
-        )}
-      </>
-    );
-  }
+                          }}
+                          bg={bgIconButton}
+                          _hover={bgIconHover}
+                          _active={bgIconFocus}
+                          _focus={bgIconFocus}
+                          w="56px"
+                          h="56px"
+                          mb="5px"
+                          boxShadow={shadow}
+                          icon={<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />}
+                        />
+                        <Text fontSize="sm" fontWeight="500" color={textColor}>
+                          Top Up
+                        </Text>
+                      </Flex>
+                    </React.Fragment>
+                  ))}
+              </SimpleGrid>
+              {showReset && (
+                <Button
+                  isLoading={isLoadingReset}
+                  //isDisabled={isLoadingReset}
+                  mb="10px"
+                  mt="20px"
+                  onClick={() => handleEndDay()}
+                  variant="brand"
+                  fontSize="14px"
+                  fontWeight="500"
+                  w="100%"
+                  h="50"
+                >
+                  CLOSE STOCK.
+                </Button>
+              )}
+            </Card>
+          </Flex>
+        </CenteredAuth>
+      )}
+    </>
+  );
+}
