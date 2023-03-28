@@ -105,7 +105,7 @@ function ForgotPassword() {
     try {
       setIsLoading(true);
       const otp = `${otpDigit1}${otpDigit2}${otpDigit3}${otpDigit4}`;
-      const response = await fetch("http://localhost:8080/api/auth/verify", {
+      const response = await fetch("https://shark-app-u49ku.ondigitalocean.app/api/auth/verify", {
         method: "POST",
         body: JSON.stringify({ otp: otp, userId: userId }),
         headers: {
@@ -137,7 +137,7 @@ function ForgotPassword() {
 
     try {
       setIsLoadingResend(true);
-      const response = await fetch("http://localhost:8080/api/auth/resend", {
+      const response = await fetch("https://shark-app-u49ku.ondigitalocean.app/api/auth/resend", {
         method: "POST",
         body: JSON.stringify({ userId: userId }),
         headers: {

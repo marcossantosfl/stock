@@ -84,15 +84,13 @@ export default function DashBoard() {
   useEffect(() => {
     setIsLoading(true);
 
-    alert(token)
-
     if(token == null)
     {
       localStorage.clear();
       router.push('/home');
     }
     
-    fetch(`http://localhost:8080/api/auth/stocks/${userId}`, {
+    fetch(`https://shark-app-u49ku.ondigitalocean.app/api/auth/stocks/${userId}`, {
       headers: {
         Accept: 'application/json',
         "x-access-token": token
@@ -113,7 +111,7 @@ export default function DashBoard() {
         const headers = {
           "x-access-token": token
         };
-        const response = await axios.get(`http://localhost:8080/api/auth/bill/${userId}`, { headers });
+        const response = await axios.get(`https://shark-app-u49ku.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
         setBill(response.data.bill);
         if (response.data.bill.end) {
           //router.push('/user/end-bill'); // Replace '/thank-you-page' with the path to your desired page
@@ -148,7 +146,7 @@ export default function DashBoard() {
       const headers = {
         "x-access-token": token
       };
-      const response = await axios.post(`http://localhost:8080/api/auth/stocks/${userId}/${stock.id}`, { action }, { headers });
+      const response = await axios.post(`https://shark-app-u49ku.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, { action }, { headers });
       if (response.data.message === 'Stock updated successfully') {
         await Promise.all([
           new Promise(resolve => setTimeout(resolve, 1000)),
@@ -191,7 +189,7 @@ export default function DashBoard() {
       const headers = {
         "x-access-token": token
       };
-      const response = await axios.post(`http://localhost:8080/api/auth/bill/${userId}/mark-as-delivered`, { headers });
+      const response = await axios.post(`https://shark-app-u49ku.ondigitalocean.app/api/auth/bill/${userId}/mark-as-delivered`, { headers });
       if (response.data.message === 'Bill marked as delivered successfully') {
         // Do something after the bill has been marked as delivered
         setTimeout(() => {
@@ -215,7 +213,7 @@ export default function DashBoard() {
       const headers = {
         "x-access-token": token
       };
-      const response = await axios.post(`http://localhost:8080/api/auth/bill/${userId}/close`, { action: "close" }, { headers });
+      const response = await axios.post(`https://shark-app-u49ku.ondigitalocean.app/api/auth/bill/${userId}/close`, { action: "close" }, { headers });
       if (response.data.message === 'Bill closed') {
         // Do something after the bill has been marked as delivered
         setTimeout(() => {
@@ -257,7 +255,7 @@ export default function DashBoard() {
 
     try {
       const stock = stocks[index];
-      const response = await axios.post(`http://localhost:8080/api/auth/stocks/${userId}/${stock.id}`, { action });
+      const response = await axios.post(`https://shark-app-u49ku.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, { action });
       if (response.data.message === 'Stock updated successfully') {
         await Promise.all([
           new Promise(resolve => setTimeout(resolve, 1000)),

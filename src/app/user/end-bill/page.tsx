@@ -63,13 +63,13 @@ export default function DashBoard() {
       localStorage.clear();
       router.push('/home');
     }
-    
+
     const fetchBill = async () => {
       try {
         const headers = {
           "x-access-token": token
         };
-        const response = await axios.get(`http://localhost:8080/api/auth/bill/${userId}`, { headers });
+        const response = await axios.get(`https://shark-app-u49ku.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
         setBill(response.data.bill);
         if (response.data.bill.end) {
           //router.push('/user/end-bill');
