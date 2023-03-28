@@ -45,6 +45,7 @@ import IconBox from 'components/icons/IconBox';
 import Controller from 'components/admin/dashboards/smart-home/Controller';
 import { useRouter } from 'next/navigation';
 import { useSwipeable } from 'react-swipeable';
+import { useLongPress } from "react-use";
 
 export default function DashBoard() {
   const router = useRouter();
@@ -369,12 +370,12 @@ export default function DashBoard() {
     }
   }
 
-  const longPressEvent = useLongPress(handleLongPress, 500);
+  const longPressEvent = useLongPress(handleLongPress, {delay : 500});
 
   const customProps = {
-    onTouchStart: handleLongPress,
-    onMouseDown: handleLongPress,
-  };
+    onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => longPressEvent.onMouseDown(e.nativeEvent),
+    onTouchStart: (e: React.TouchEvent<HTMLButtonElement>) => longPressEvent.onTouchStart(e.nativeEvent),
+  };  
 
   return (
     <>
@@ -620,8 +621,4 @@ export default function DashBoard() {
       )}
     </>
   );
-}
-
-function useLongPress(handleLongPress: any, arg1: number) {
-  throw new Error('Function not implemented.');
 }
