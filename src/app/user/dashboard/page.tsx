@@ -508,7 +508,7 @@ export default function DashBoard() {
                             mb="5px"
                             boxShadow={shadow}
                             icon={icon}
-                            onDoubleClick={handleDoubleClick}
+                            onDoubleClick={() => handleDoubleClick()}
                           />
                           <Text fontSize="sm" fontWeight="500" color={textColor}>
                             Subtract -1
