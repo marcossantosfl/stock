@@ -71,7 +71,7 @@ const SignUp = () => {
         router.push("/auth/verification/centered");
       }, 2000);
     }
-  }, [isRegister, router]);
+  }, [isRegister]);
 
   // Chakra color mode
   const textColor = useColorModeValue('navy.700', 'white');
