@@ -133,6 +133,16 @@ export default function DashBoard() {
     }, 2000);
   }, [isLoadingMarkAsDelivered]);
 
+  useEffect(() => {
+    let timer;
+    if (!isSingleClick) {
+      timer = setTimeout(() => {
+        setIsSingleClick(true);
+      }, 300); // Change this value to adjust the timeout between clicks
+    }
+    return () => clearTimeout(timer);
+  }, [isSingleClick]);
+
 
 
   const handleStockUpdate1 = async (index, action) => {
