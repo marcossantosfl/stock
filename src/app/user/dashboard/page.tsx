@@ -85,16 +85,16 @@ export default function DashBoard() {
 
   const [iconIndex, setIconIndex] = useState(0);
   const icons = [
-    <Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />,
-    <Icon as={RiNumber2} color={yellowIcon} w="24px" h="24px" />,
-    <Icon as={RiNumber3} color={yellowIcon} w="24px" h="24px" />,
-    <Icon as={RiNumber4} color={yellowIcon} w="24px" h="24px" />,
-    <Icon as={RiNumber5} color={yellowIcon} w="24px" h="24px" />,
-    <Icon as={RiNumber6} color={yellowIcon} w="24px" h="24px" />,
-    <Icon as={RiNumber7} color={yellowIcon} w="24px" h="24px" />,
-    <Icon as={RiNumber8} color={yellowIcon} w="24px" h="24px" />,
-    <Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />
-  ];
+    <Icon key={1} as={RiNumber1} color={yellowIcon} w="24px" h="24px" />,
+    <Icon key={2} as={RiNumber2} color={yellowIcon} w="24px" h="24px" />,
+    <Icon key={3} as={RiNumber3} color={yellowIcon} w="24px" h="24px" />,
+    <Icon key={4} as={RiNumber4} color={yellowIcon} w="24px" h="24px" />,
+    <Icon key={5} as={RiNumber5} color={yellowIcon} w="24px" h="24px" />,
+    <Icon key={6} as={RiNumber6} color={yellowIcon} w="24px" h="24px" />,
+    <Icon key={7} as={RiNumber7} color={yellowIcon} w="24px" h="24px" />,
+    <Icon key={8} as={RiNumber8} color={yellowIcon} w="24px" h="24px" />,
+    <Icon key={9} as={RiNumber9} color={yellowIcon} w="24px" h="24px" />
+  ];  
 
   useEffect(() => {
     setTimeout(() => {
@@ -470,7 +470,7 @@ export default function DashBoard() {
               <SimpleGrid columns={3} gap="30px" alignItems="center" justifyContent="center" textAlign="center">
                 {Array.isArray(stocks) &&
                   stocks.map((stock, index) => (
-                    <React.Fragment key={stock.id}>
+                    <React.Fragment key={index}>
                       <Flex
                         direction="column"
                         alignItems="center"
