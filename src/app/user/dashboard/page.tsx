@@ -60,7 +60,7 @@ export default function DashBoard() {
   const [isLoadingReset, setIsLoadingReset] = useState(false);
   const [bill, setBill] = useState(null);
   const [number, setNumber] = useState(1);
-
+  const [isSingleClick, setIsSingleClick] = useState(true);
   const boxBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.100');
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const brandColor = useColorModeValue('brand.500', 'white');
@@ -81,6 +81,8 @@ export default function DashBoard() {
 
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
+
+  
 
   useEffect(() => {
     setTimeout(() => {
@@ -256,7 +258,6 @@ export default function DashBoard() {
   });
 
 
-
   const handleStockUpdate2 = async (index, action) => {
     if (isLoadingButtons2[index]) {
       // Stock is already being updated, do nothing
@@ -309,7 +310,14 @@ export default function DashBoard() {
     }
   };
 
+  const handleClick = (index) => {
+    if (isSingleClick) {
+      handleStockUpdate1(index, 'subtract');
+    }
+  };
+
   const handleDoubleClick = () => {
+    setIsSingleClick(false);
     if (number < 9) {
       setNumber(number + 1);
     } else {
@@ -499,7 +507,7 @@ export default function DashBoard() {
                             borderRadius="50%"
                             isDisabled={isLoadingButtons1[index] || stock.amount == 0}
                             isLoading={isLoadingButtons1[index]}
-                            onClick={() => handleStockUpdate1(index, 'subtract')}
+                            onClick={() => handleClick(index)}
                             bg={bgIconButton}
                             _hover={bgIconHover}
                             _active={bgIconFocus}
