@@ -186,6 +186,11 @@ export default function DashBoard() {
 
   const handleMarkAsDelivered = async () => {
 
+    if(isLoadingMarkAsDelivered)
+    {
+      return;
+    }
+
     setIsLoadingMarkAsDelivered(true);
     try {
       const headers = {
@@ -211,6 +216,12 @@ export default function DashBoard() {
   };
 
   const handleEndDay = async () => {
+
+    if(isLoadingReset)
+    {
+      return;
+    }
+
     setIsLoadingReset(true);
     try {
       const headers = {
@@ -411,7 +422,7 @@ export default function DashBoard() {
                 {showMarkAsDelivered && (
                   <Button
                     isLoading={isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingMarkAsDelivered}
+                    //isDisabled={isLoadingMarkAsDelivered}
                     mb="10px"
                     mt="10px"
                     onClick={() => handleMarkAsDelivered()}
@@ -518,7 +529,7 @@ export default function DashBoard() {
                 {showReset && (
                   <Button
                     isLoading={isLoadingReset}
-                    isDisabled={isLoadingReset}
+                    //isDisabled={isLoadingReset}
                     mb="10px"
                     mt="20px"
                     onClick={() => handleEndDay()}

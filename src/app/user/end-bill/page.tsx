@@ -209,7 +209,7 @@ export default function DashBoard() {
                     />
                   }
                   name="Stock To Pay"
-                  value={`€${bill.toPayTotal.toFixed(2)}`}
+                  value={`€${bill.toPayTotal}`}
                 />
               </SimpleGrid>
 

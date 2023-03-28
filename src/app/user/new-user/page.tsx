@@ -101,6 +101,12 @@ export default function NewUser() {
   };
 
   const handleAddStock = () => {
+
+    if(isLoading)
+    {
+      return;
+    }
+
     setIsLoading(true);
     if (!currentStock || currentAmount <= 0 || Number(selectedOption) <= 0) {
       setError("You must fill the fields");
@@ -124,6 +130,11 @@ export default function NewUser() {
   };
 
   const handleSubmit = async () => {
+
+    if(isSubmitted)
+    {
+      return;
+    }
 
     setIisSubmitted(true);
     setErrorRequest('')

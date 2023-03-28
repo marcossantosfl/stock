@@ -96,6 +96,11 @@ function ForgotPassword() {
 
   const handleUnlock = async () => {
 
+    if(isLoading)
+    {
+      return;
+    }
+
     if (!otpDigit1 || !otpDigit2 || !otpDigit3 || !otpDigit4) {
       setError("Please enter a 4 digit OTP code");
       return;
@@ -134,6 +139,11 @@ function ForgotPassword() {
   };
 
   const handleResendCode = async () => {
+
+    if(isLoadingResend)
+    {
+      return;
+    }
 
     setErrorInvalid("");
     setError("");
@@ -330,7 +340,7 @@ function ForgotPassword() {
                       </FormLabel>
                     )}
                     <Button
-                      disabled={isLoadingResend}
+                      //disabled={isLoadingResend}
                       fontSize="14px"
                       variant="brand"
                       borderRadius="16px"
@@ -339,7 +349,7 @@ function ForgotPassword() {
                       h="50"
                       mb="24px"
                       mt="12px"
-                      isLoading={isLoading}
+                      isLoading={isLoadingResend}
                       onClick={handleUnlock}
                     >
                       Verify

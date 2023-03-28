@@ -111,6 +111,12 @@ const SignUp = () => {
   };
 
   const handleCreateAccount = async () => {
+
+    if(isLoading)
+    {
+      return;
+    }
+    
     let error = false;
 
     if (!isChecked) {
@@ -319,7 +325,7 @@ const SignUp = () => {
                   h="50"
                   mb="24px"
                   isLoading={isLoading}
-                  isDisabled={isLoading}
+                  //isDisabled={isLoading}
                   onClick={handleCreateAccount}
                 >
                   Create my account
