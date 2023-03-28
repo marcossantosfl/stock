@@ -330,7 +330,7 @@ export default function DashBoard() {
     setIconIndex((iconIndex + 1) % icons.length);
   }
 
-  const longPressEvent = useLongPress(handleLongPress, { delay: 1600 });
+  const longPressEvent = useLongPress(handleLongPress, { delay: 2000 });
 
   const customProps = {
     onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => longPressEvent.onMouseDown(e.nativeEvent),
