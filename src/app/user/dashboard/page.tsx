@@ -82,6 +82,7 @@ export default function DashBoard() {
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
   useEffect(() => {
+    setTimeout(() => {
     setIsLoading(true);
 
     if(token == null)
@@ -103,9 +104,13 @@ export default function DashBoard() {
       .catch(err => {
         console.error(err);
       });
+    }, 1000);
   }, [userId]);
 
   useEffect(() => {
+    setTimeout(() => {
+
+    
     const fetchBill = async () => {
       try {
         const headers = {
@@ -126,6 +131,7 @@ export default function DashBoard() {
     };
   
     fetchBill();
+  }, 1000);
   }, [isLoadingMarkAsDelivered]);
   
 
