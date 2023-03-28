@@ -120,8 +120,8 @@ function ForgotPassword() {
       localStorage.setItem("accessToken", JSON.stringify(data.accessToken))
       // do something with the response data
       setTimeout(() => {
-        router.push("/user/dashboard");
-      }, 2000);
+        router.push("/user/new-user");
+      }, 1500);
     } catch (error) {
       setErrorInvalid("Invalid code, please try again");
       console.error(error);
