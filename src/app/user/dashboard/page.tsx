@@ -60,7 +60,7 @@ export default function DashBoard() {
   const [isLoadingReset, setIsLoadingReset] = useState(false);
   const [bill, setBill] = useState(null);
   const [number, setNumber] = useState(1);
-  const [isSingleClick, setIsSingleClick] = useState(true);
+  const [isSingleClick, setIsSingleClick] = useState(false);
   const boxBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.100');
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const brandColor = useColorModeValue('brand.500', 'white');
@@ -82,7 +82,7 @@ export default function DashBoard() {
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
-  const [icon, setIcon] = useState(<Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />);
+  const [icon, setIcon] = useState(<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />);
 
   useEffect(() => {
     setTimeout(() => {
