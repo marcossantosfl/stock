@@ -386,6 +386,7 @@ export default function DashBoard() {
             cardTop={{ base: '140px', md: '24vh' }}
             cardBottom={{ base: '50px', lg: 'auto' }}
             showCard={true}
+            {...swipeHandlers}
           >
             <Flex
               w="100%"
