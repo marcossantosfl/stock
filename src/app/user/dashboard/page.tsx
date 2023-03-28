@@ -83,7 +83,8 @@ export default function DashBoard() {
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
-  const [icons, setIcons] = useState([
+  const [iconIndex, setIconIndex] = useState(0);
+  const icons = [
     <Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />,
     <Icon as={RiNumber2} color={yellowIcon} w="24px" h="24px" />,
     <Icon as={RiNumber3} color={yellowIcon} w="24px" h="24px" />,
@@ -92,9 +93,8 @@ export default function DashBoard() {
     <Icon as={RiNumber6} color={yellowIcon} w="24px" h="24px" />,
     <Icon as={RiNumber7} color={yellowIcon} w="24px" h="24px" />,
     <Icon as={RiNumber8} color={yellowIcon} w="24px" h="24px" />,
-    <Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />,
-  ]);
-  const [iconIndex, setIconIndex] = useState(0);
+    <Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />
+  ];
 
   useEffect(() => {
     setTimeout(() => {
@@ -327,7 +327,7 @@ export default function DashBoard() {
       setNumber(1);
     }
 
-    setIconIndex((prevIndex) => (prevIndex + 1) % icons.length);
+    setIconIndex((iconIndex + 1) % icons.length);
   }
 
   const longPressEvent = useLongPress(handleLongPress, { delay: 1000 });
