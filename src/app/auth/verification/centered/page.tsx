@@ -105,7 +105,7 @@ function ForgotPassword() {
     try {
       setIsLoading(true);
       const otp = `${otpDigit1}${otpDigit2}${otpDigit3}${otpDigit4}`;
-      const response = await fetch("https://shark-app-u49ku.ondigitalocean.app/api/auth/verify", {
+      const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/verify", {
         method: "POST",
         body: JSON.stringify({ otp: otp, userId: userId }),
         headers: {
