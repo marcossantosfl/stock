@@ -92,7 +92,7 @@ export default function DashBoard() {
     
     fetch(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}`, {
       headers: {
-        Accept: 'application/json',
+        "Accept" : 'application/json',
         "x-access-token": token
       }
     })
@@ -109,7 +109,8 @@ export default function DashBoard() {
     const fetchBill = async () => {
       try {
         const headers = {
-          "x-access-token": token
+          "x-access-token": token,
+          "Accept" : 'application/json',
         };
         const response = await axios.get(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
         setBill(response.data.bill);
@@ -144,7 +145,8 @@ export default function DashBoard() {
     try {
       const stock = stocks[index];
       const headers = {
-        "x-access-token": token
+        "x-access-token": token,
+        "Accept" : 'application/json',
       };
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, { action }, { headers });
       if (response.data.message === 'Stock updated successfully') {
@@ -187,9 +189,10 @@ export default function DashBoard() {
     setIsLoadingMarkAsDelivered(true);
     try {
       const headers = {
-        "x-access-token": token
+        "x-access-token": token,
+        "Accept" : 'application/json',
       };
-      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}/mark-as-delivered`, { headers });
+      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}/mark-as-delivered`, {}, { headers });
       if (response.data.message === 'Bill marked as delivered successfully') {
         // Do something after the bill has been marked as delivered
         setTimeout(() => {
@@ -211,7 +214,8 @@ export default function DashBoard() {
     setIsLoadingReset(true);
     try {
       const headers = {
-        "x-access-token": token
+        "x-access-token": token,
+        "Accept" : 'application/json',
       };
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}/close`, { action: "close" }, { headers });
       if (response.data.message === 'Bill closed') {
@@ -255,7 +259,11 @@ export default function DashBoard() {
 
     try {
       const stock = stocks[index];
-      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, { action });
+      const headers = {
+        "x-access-token": token,
+        "Accept" : 'application/json',
+      };
+      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, { action }, { headers });
       if (response.data.message === 'Stock updated successfully') {
         await Promise.all([
           new Promise(resolve => setTimeout(resolve, 1000)),
@@ -278,7 +286,7 @@ export default function DashBoard() {
         ]);
       }
     } catch (error) {
-      console.error(error);
+      console.error(JSON.stringify(error));
       setTimeout(() => {
         setIsLoadingButtons2(prev => {
           const copy = [...prev];
@@ -374,8 +382,8 @@ export default function DashBoard() {
                           }
                         />
                       }
-                      name="System Bill"
-                      value={`€${bill.toPay.toFixed(2)}`}
+                      name="To Pay"
+                      value={`€${bill.toPayTotal}`}
                     />
                   )}
 

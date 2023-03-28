@@ -67,7 +67,8 @@ export default function DashBoard() {
     const fetchBill = async () => {
       try {
         const headers = {
-          "x-access-token": token
+          "x-access-token": token,
+          "Accept" : 'application/json',
         };
         const response = await axios.get(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
         setBill(response.data.bill);
