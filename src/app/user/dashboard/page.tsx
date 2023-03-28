@@ -83,7 +83,18 @@ export default function DashBoard() {
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
-  const [icon, setIcon] = useState(<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />);
+  const [icons, setIcons] = useState([
+    <Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />,
+    <Icon as={RiNumber2} color={yellowIcon} w="24px" h="24px" />,
+    <Icon as={RiNumber3} color={yellowIcon} w="24px" h="24px" />,
+    <Icon as={RiNumber4} color={yellowIcon} w="24px" h="24px" />,
+    <Icon as={RiNumber5} color={yellowIcon} w="24px" h="24px" />,
+    <Icon as={RiNumber6} color={yellowIcon} w="24px" h="24px" />,
+    <Icon as={RiNumber7} color={yellowIcon} w="24px" h="24px" />,
+    <Icon as={RiNumber8} color={yellowIcon} w="24px" h="24px" />,
+    <Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />,
+  ]);
+  const [iconIndex, setIconIndex] = useState(0);
 
   useEffect(() => {
     setTimeout(() => {
@@ -133,18 +144,6 @@ export default function DashBoard() {
       fetchBill();
     }, 2000);
   }, [isLoadingMarkAsDelivered]);
-
-  useEffect(() => {
-    let timer;
-    if (!isSingleClick) {
-      timer = setTimeout(() => {
-        setIsSingleClick(true);
-      }, 300); // Change this value to adjust the timeout between clicks
-    }
-    return () => clearTimeout(timer);
-  }, [isSingleClick]);
-
-
 
   const handleStockUpdate1 = async (index, action) => {
     if (isLoadingButtons1[index]) {
@@ -328,46 +327,15 @@ export default function DashBoard() {
       setNumber(1);
     }
 
-    let icon;
-    switch (number) {
-      case 1:
-        setIcon(<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />);
-        break;
-      case 2:
-        setIcon(<Icon as={RiNumber2} color={yellowIcon} w="24px" h="24px" />);
-        break;
-      case 3:
-        setIcon(<Icon as={RiNumber3} color={yellowIcon} w="24px" h="24px" />);
-        break;
-      case 4:
-        setIcon(<Icon as={RiNumber4} color={yellowIcon} w="24px" h="24px" />);
-        break;
-      case 5:
-        setIcon(<Icon as={RiNumber5} color={yellowIcon} w="24px" h="24px" />);
-        break;
-      case 6:
-        setIcon(<Icon as={RiNumber6} color={yellowIcon} w="24px" h="24px" />);
-        break;
-      case 7:
-        setIcon(<Icon as={RiNumber7} color={yellowIcon} w="24px" h="24px" />);
-        break;
-      case 8:
-        setIcon(<Icon as={RiNumber8} color={yellowIcon} w="24px" h="24px" />);
-        break;
-      case 9:
-        setIcon(<Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />);
-        break;
-      default:
-        icon = null;
-    }
+    setIconIndex((prevIndex) => (prevIndex + 1) % icons.length);
   }
 
-  const longPressEvent = useLongPress(handleLongPress, {delay : 1000});
+  const longPressEvent = useLongPress(handleLongPress, { delay: 1000 });
 
   const customProps = {
     onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => longPressEvent.onMouseDown(e.nativeEvent),
     onTouchStart: (e: React.TouchEvent<HTMLButtonElement>) => longPressEvent.onTouchStart(e.nativeEvent),
-  };  
+  };
 
   return (
     <>
@@ -527,7 +495,7 @@ export default function DashBoard() {
                           h="56px"
                           mb="5px"
                           boxShadow={shadow}
-                          icon={icon}
+                          icon={icons[iconIndex]}
                           {...customProps}
                         />
                         <Text fontSize="sm" fontWeight="500" color={textColor}>
