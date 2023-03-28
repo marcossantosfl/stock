@@ -179,12 +179,33 @@ function ForgotPassword() {
   return (
     <>
       {isSigned ? (
-        <Spinner
-          size="lg"
-          m="auto"
-          mt="50px"
-          display="block"
-        />
+          <CenteredAuth
+          image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+          cardTop={{ base: '140px', md: '14vh' }}
+          cardBottom={{ base: '50px', lg: '100px' }}
+          showCard={true}
+          cardSx={{ bg: 'none' }}
+        >
+          <Flex
+            w="100%"
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            h="100%"
+            justifyContent="center"
+            px={{ base: '25px', md: '0px' }}
+            flexDirection="column"
+          >
+            <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
+            <Text mb="36px"
+              ms="4px"
+              color="white"
+              fontWeight="400"
+              fontSize="lg" textAlign='center'>
+              Loading...
+            </Text>
+          </Flex>
+        </CenteredAuth>
       ) : (
         <>
           {showSuccess ? (

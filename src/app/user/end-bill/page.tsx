@@ -106,7 +106,7 @@ export default function DashBoard() {
   return (
     <>
       {isLoading ? (
-        <CenteredAuth
+          <CenteredAuth
           image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
           cardTop={{ base: '140px', md: '14vh' }}
           cardBottom={{ base: '50px', lg: '100px' }}
@@ -114,12 +114,14 @@ export default function DashBoard() {
           cardSx={{ bg: 'none' }}
         >
           <Flex
-            direction="column"
-
-            align="center"
+            w="100%"
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            h="100%"
             justifyContent="center"
-            pt={{ sm: '125px', lg: '75px' }}
-            position="relative"
+            px={{ base: '25px', md: '0px' }}
+            flexDirection="column"
           >
             <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
             <Text mb="36px"
