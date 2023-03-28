@@ -21,7 +21,7 @@
 
 */
 
-import React, { ChangeEvent, useEffect, useRef  } from 'react';
+import React, { ChangeEvent, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 // Chakra imports
 import {
@@ -58,7 +58,7 @@ const SignUp = () => {
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
 
   const [isRegister, setIsRegister] = React.useState(false);
-  
+
   useEffect(() => {
     if (userId) {
       setIsRegister(true);
@@ -110,244 +110,247 @@ const SignUp = () => {
     }
   };
 
-const handleCreateAccount = async () => {
-  let error = false;
+  const handleCreateAccount = async () => {
+    let error = false;
 
-  if (!isChecked) {
-    setErrorAgree("You must agree to the Terms and Conditions and Privacy Policy");
-    error = true;
-  } else {
-    setErrorAgree(null);
-  }
+    if (!isChecked) {
+      setErrorAgree("You must agree to the Terms and Conditions and Privacy Policy");
+      error = true;
+    } else {
+      setErrorAgree(null);
+    }
 
-  if (!isValidNumber(phoneNumber)) {
-    setError("Invalid phone number");
-    error = true;
-  } else {
-    setError(null);
-  }
+    if (!isValidNumber(phoneNumber)) {
+      setError("Invalid phone number");
+      error = true;
+    } else {
+      setError(null);
+    }
 
-  setErrorUser("")
+    setIsLoading(true);
+    setErrorUser("")
 
-  if (!error) {
-    try {
-      setIsLoading(true);
-      const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/register", {
-        method: "POST",
-        body: JSON.stringify({
-          phoneNumber: phoneNumber,
-          agreedToTerms: isChecked,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+    if (!error) {
+      try {
+        const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/register", {
+          method: "POST",
+          body: JSON.stringify({
+            phoneNumber: phoneNumber,
+            agreedToTerms: isChecked,
+          }),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
 
-      if (response.status === 400) {
-        setErrorUser("This phone number is already registered");
-        throw new Error("HTTP error " + response.status);
+        if (response.status === 400) {
+          setErrorUser("This phone number is already registered");
+          throw new Error("HTTP error " + response.status);
         }
 
-      if (!response.ok) {
-        throw new Error("HTTP error " + response.status);
+        if (!response.ok) {
+          throw new Error("HTTP error " + response.status);
+        }
+        const data = await response.json();
+
+        localStorage.setItem("userId", JSON.stringify(data.userId))
+
+        setTimeout(() => {
+          router.push("/auth/verification/centered");
+        }, 1000);
+      } catch (error) {
+        console.error(error);
+        setIsLoading(false);
       }
-      const data = await response.json();
-
-      localStorage.setItem("userId", JSON.stringify(data.userId))
-
-      setTimeout(() => {
-        router.push("/auth/verification/centered");
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-      setIsLoading(false);
     }
-  }
-};
+  };
 
 
   return (
     <>
-    {isRegister ? (
+      {isRegister ? (
         <CenteredAuth
-        image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
-        cardTop={{ base: '140px', md: '14vh' }}
-        cardBottom={{ base: '50px', lg: '100px' }}
-        showCard={true}
-        cardSx={{ bg: 'none' }}
-      >
-        <Flex
-          direction="column"
-
-          align="center"
-          justifyContent="center"
-          pt={{ sm: '125px', lg: '75px' }}
-          position="relative"
+          image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+          cardTop={{ base: '140px', md: '14vh' }}
+          cardBottom={{ base: '50px', lg: '100px' }}
+          showCard={true}
+          cardSx={{ bg: 'none' }}
         >
-          <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
-          <Text mb="36px"
-            ms="4px"
-            color="white"
-            fontWeight="400"
-            fontSize="lg" textAlign='center'>
-            Loading...
-          </Text>
-        </Flex>
-      </CenteredAuth>
-      ) : (
-    <CenteredAuth
-      image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
-      cardTop={{ base: '140px', md: '14vh' }}
-      cardBottom={{ base: '50px', lg: '100px' }}
-    >
-      <Flex
-        maxW="max-content"
-        mx={{ base: 'auto', lg: '0px' }}
-        me="auto"
-        justifyContent="center"
-        px={{ base: '20px', md: '0px' }}
-        flexDirection="column"
-      >
-        <Box me="auto">
-          <Heading
-            color={textColor}
-            fontSize={{ base: '34px', lg: '36px' }}
-            mb="10px"
-          >
-            Sign Up
-          </Heading>
-          <Text
-            mb="36px"
-            ms="4px"
-            color={textColorSecondary}
-            fontWeight="400"
-            fontSize="md"
-          >
-            Enter your phone number.
-          </Text>
-        </Box>
-        <Flex
-          zIndex="2"
-          direction="column"
-          w={{ base: '100%', md: '420px' }}
-          maxW="100%"
-          background="transparent"
-          borderRadius="15px"
-          mx={{ base: 'auto', lg: 'unset' }}
-          me="auto"
-          mb={{ base: '20px', md: 'auto' }}
-        >
-          <FormControl>
-            <FormLabel
-              ms="4px"
-              fontSize="sm"
-              fontWeight="500"
-              color={textColor}
-              display="flex"
-            >
-              Phone Number<Text color={brandStars}>*</Text>
-            </FormLabel>
-            <InputGroup size="md">
-            <PhoneNumberInput
-                isRequired={true}
-                size="lg"
-                type="tel" placeholder="phone number" borderRadius="16px"
-                value={phoneNumber}
-                options={countryOptions}
-                onChange={phoneNumber => handlePhoneNumberChange(phoneNumber)} country={undefined}
-                />
-                
-            </InputGroup>
-            {error && (
-            <FormLabel textAlign="center" fontSize="sm" color="red.500">
-              {error}
-            </FormLabel>
-          )}
-            <Flex justifyContent="space-between" align="center" mb="24px">
-              <FormControl display="flex" alignItems="start">
-                <Checkbox
-                  id="remember-login"
-                  colorScheme="brandScheme"
-                  me="10px"
-                  mt="3px"
-                  isChecked={isChecked}
-                  onChange={() => handleCheckboxChange ()}
-                />
-                <FormLabel
-                  htmlFor="remember-login"
-                  mb="0"
-                  fontWeight="normal"
-                  color={textColor}
-                  fontSize="sm"
-                >
-                  By creating an account means you agree to the{' '}
-                  <Link
-                    href="https://simmmple.com/terms-of-service"
-                    fontWeight="500"
-                  >
-                    Terms and Conditions,
-                  </Link>{' '}
-                  and our{' '}
-                  <Link
-                    href="https://simmmple.com/privacy-policy"
-                    fontWeight="500"
-                  >
-                    Privacy Policy
-                  </Link>
-                </FormLabel>
-              </FormControl>
-              
-            </Flex>
-            {errorAgree && (
-      <FormLabel fontSize="sm" textAlign="center" color="red.500">
-        {errorAgree}
-
-      </FormLabel>
-    )}
-                {errorUser && (
-      <FormLabel fontSize="sm" textAlign="center" color="red.500">
-        {errorUser}
-      </FormLabel>
-    )}
-            <Button
-              variant="brand"
-              fontSize="14px"
-              fontWeight="500"
-              w="100%"
-              h="50"
-              mb="24px"
-              isLoading={isLoading}
-      onClick={handleCreateAccount}
-            >
-              Create my account
-            </Button>
-          </FormControl>
           <Flex
-            flexDirection="column"
+            direction="column"
+
+            align="center"
             justifyContent="center"
-            alignItems="start"
-            maxW="100%"
-            mt="0px"
+            pt={{ sm: '125px', lg: '75px' }}
+            position="relative"
           >
-            <Text color={textColorDetails} fontWeight="400" fontSize="sm">
-              Already a member?
-              <Link href="/auth/sign-in/centered">
-                <Text
-                  color={textColorBrand}
-                  as="span"
-                  ms="5px"
-                  fontWeight="500"
-                >
-                  Sign in
-                </Text>
-              </Link>
+            <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
+            <Text mb="36px"
+              ms="4px"
+              color="white"
+              fontWeight="400"
+              fontSize="lg" textAlign='center'>
+              Loading...
             </Text>
           </Flex>
-        </Flex>
-      </Flex>
-      
-    </CenteredAuth>
-    )}
+        </CenteredAuth>
+      ) : (
+        <CenteredAuth
+          image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+          cardTop={{ base: '140px', md: '14vh' }}
+          cardBottom={{ base: '50px', lg: '100px' }}
+        >
+          <Flex
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            justifyContent="center"
+            px={{ base: '20px', md: '0px' }}
+            flexDirection="column"
+          >
+            <Box me="auto">
+              <Heading
+                color={textColor}
+                fontSize={{ base: '34px', lg: '36px' }}
+                mb="10px"
+              >
+                Sign Up
+              </Heading>
+              <Text
+                mb="36px"
+                ms="4px"
+                color={textColorSecondary}
+                fontWeight="400"
+                fontSize="md"
+              >
+                Enter your phone number.
+              </Text>
+            </Box>
+            <Flex
+              zIndex="2"
+              direction="column"
+              w={{ base: '100%', md: '420px' }}
+              maxW="100%"
+              background="transparent"
+              borderRadius="15px"
+              mx={{ base: 'auto', lg: 'unset' }}
+              me="auto"
+              mb={{ base: '20px', md: 'auto' }}
+            >
+              <FormControl>
+                <FormLabel
+                  ms="4px"
+                  fontSize="sm"
+                  fontWeight="500"
+                  color={textColor}
+                  display="flex"
+                >
+                  Phone Number<Text color={brandStars}>*</Text>
+                </FormLabel>
+                <InputGroup size="md">
+                  <PhoneNumberInput
+                    isDisabled={isLoading}
+                    isRequired={true}
+                    size="lg"
+                    type="tel" placeholder="phone number" borderRadius="16px"
+                    value={phoneNumber}
+                    options={countryOptions}
+                    onChange={phoneNumber => handlePhoneNumberChange(phoneNumber)} country={undefined}
+                  />
+
+                </InputGroup>
+                {error && (
+                  <FormLabel textAlign="center" fontSize="sm" color="red.500">
+                    {error}
+                  </FormLabel>
+                )}
+                <Flex justifyContent="space-between" align="center" mb="24px">
+                  <FormControl display="flex" alignItems="start">
+                    <Checkbox
+                      isDisabled={isLoading}
+                      id="remember-login"
+                      colorScheme="brandScheme"
+                      me="10px"
+                      mt="3px"
+                      isChecked={isChecked}
+                      onChange={() => handleCheckboxChange()}
+                    />
+                    <FormLabel
+                      htmlFor="remember-login"
+                      mb="0"
+                      fontWeight="normal"
+                      color={textColor}
+                      fontSize="sm"
+                    >
+                      By creating an account means you agree to the{' '}
+                      <Link
+                        href="https://simmmple.com/terms-of-service"
+                        fontWeight="500"
+                      >
+                        Terms and Conditions,
+                      </Link>{' '}
+                      and our{' '}
+                      <Link
+                        href="https://simmmple.com/privacy-policy"
+                        fontWeight="500"
+                      >
+                        Privacy Policy
+                      </Link>
+                    </FormLabel>
+                  </FormControl>
+
+                </Flex>
+                {errorAgree && (
+                  <FormLabel fontSize="sm" textAlign="center" color="red.500">
+                    {errorAgree}
+
+                  </FormLabel>
+                )}
+                {errorUser && (
+                  <FormLabel fontSize="sm" textAlign="center" color="red.500">
+                    {errorUser}
+                  </FormLabel>
+                )}
+                <Button
+                  variant="brand"
+                  fontSize="14px"
+                  fontWeight="500"
+                  w="100%"
+                  h="50"
+                  mb="24px"
+                  isLoading={isLoading}
+                  isDisabled={isLoading}
+                  onClick={handleCreateAccount}
+                >
+                  Create my account
+                </Button>
+              </FormControl>
+              <Flex
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="start"
+                maxW="100%"
+                mt="0px"
+              >
+                <Text color={textColorDetails} fontWeight="400" fontSize="sm">
+                  Already a member?
+                  <Link href="/auth/sign-in/centered">
+                    <Text
+                      color={textColorBrand}
+                      as="span"
+                      ms="5px"
+                      fontWeight="500"
+                    >
+                      Sign in
+                    </Text>
+                  </Link>
+                </Text>
+              </Flex>
+            </Flex>
+          </Flex>
+
+        </CenteredAuth>
+      )}
     </>
   );
 }
