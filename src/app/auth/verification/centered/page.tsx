@@ -1,0 +1,386 @@
+'use client'
+/*!
+  _   _  ___  ____  ___ ________  _   _   _   _ ___   ____  ____   ___  
+ | | | |/ _ \|  _ \|_ _|__  / _ \| \ | | | | | |_ _| |  _ \|  _ \ / _ \ 
+ | |_| | | | | |_) || |  / / | | |  \| | | | | || |  | |_) | |_) | | | |
+ |  _  | |_| |  _ < | | / /| |_| | |\  | | |_| || |  |  __/|  _ <| |_| |
+ |_| |_|\___/|_| \_\___/____\___/|_| \_|  \___/|___| |_|   |_| \_\\___/ 
+                                                                                                                                                                                                                                                                                                                                       
+=========================================================
+* Horizon UI Dashboard PRO - v1.0.0
+=========================================================
+
+* Product Page: https://www.horizon-ui.com/pro/
+* Copyright 2022 Horizon UI (https://www.horizon-ui.com/)
+
+* Designed and Coded by Simmmple
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+*/
+
+// Chakra imports
+import {
+  Box,
+  Button,
+  Flex,
+  FormControl,
+  PinInput,
+  PinInputField,
+  Heading,
+  Text,
+  useColorModeValue,
+  FormLabel,
+  Spinner,
+} from '@chakra-ui/react';
+import CenteredAuth from '../../../../components/auth/variants/CenteredAuthLayout/page';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
+function ForgotPassword() {
+
+  const router = useRouter()
+
+
+  const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
+
+
+  // Chakra color mode
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const textColorSecondary = 'gray.400';
+  const borderColor = useColorModeValue('secondaryGray.400', 'whiteAlpha.100');
+  const textColorDetails = useColorModeValue('navy.700', 'secondaryGray.600');
+  const textColorBrand = useColorModeValue('brand.500', 'white');
+
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoadingResend, setIsLoadingResend] = React.useState(false);
+  const [error, setError] = React.useState('');
+  const [errorInvalid, setErrorInvalid] = React.useState('');
+  const [errorResend, setErrorResend] = React.useState('');
+  const [otpDigit1, setOtpDigit1] = React.useState("");
+  const [otpDigit2, setOtpDigit2] = React.useState("");
+  const [otpDigit3, setOtpDigit3] = React.useState("");
+  const [otpDigit4, setOtpDigit4] = React.useState("");
+  const [success, setSuccess] = React.useState("");
+  const [isSigned, setIsSigned] = React.useState(false);
+  const [showSuccess, setShowSuccess] = React.useState(false);
+
+  useEffect(() => {
+    if (!userId) {
+      setTimeout(() => {
+        router.push("/home");
+      }, 3000);
+    }
+  }, [userId, router]);
+
+  const handleOtpDigit1Change = (event) => {
+    setOtpDigit1(event.target.value);
+  };
+
+  const handleOtpDigit2Change = (event) => {
+    setOtpDigit2(event.target.value);
+  };
+
+  const handleOtpDigit3Change = (event) => {
+    setOtpDigit3(event.target.value);
+  };
+
+  const handleOtpDigit4Change = (event) => {
+    setOtpDigit4(event.target.value);
+  };
+
+  const handleUnlock = async () => {
+
+    if (!otpDigit1 || !otpDigit2 || !otpDigit3 || !otpDigit4) {
+      setError("Please enter a 4 digit OTP code");
+      return;
+    }
+
+    setErrorInvalid("");
+    setError("");
+    setErrorResend("");
+
+    try {
+      setIsLoading(true);
+      const otp = `${otpDigit1}${otpDigit2}${otpDigit3}${otpDigit4}`;
+      const response = await fetch("http://localhost:8080/api/auth/verify", {
+        method: "POST",
+        body: JSON.stringify({ otp: otp, userId: userId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      const data = await response.json();
+
+      localStorage.setItem("accessToken", JSON.stringify(data.accessToken))
+      // do something with the response data
+      setTimeout(() => {
+        router.push("/user/dashboard");
+      }, 2000);
+    } catch (error) {
+      setErrorInvalid("Invalid code, please try again");
+      console.error(error);
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+
+    setErrorInvalid("");
+    setError("");
+    setErrorResend("");
+
+    try {
+      setIsLoadingResend(true);
+      const response = await fetch("http://localhost:8080/api/auth/resend", {
+        method: "POST",
+        body: JSON.stringify({ userId: userId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      const data = await response.json();
+      setTimeout(() => {
+        setSuccess("A new code has been sent to your phone");
+        setIsLoadingResend(false);
+      }, 2000);
+      
+    } catch (error) {
+      setTimeout(() => {
+        setErrorResend("Failed to resend code, please try again");
+        setIsLoadingResend(false);
+      }, 2000);
+      console.error(error);
+    }
+  };
+
+  return (
+    <>
+      {isSigned ? (
+        <Spinner
+          size="lg"
+          m="auto"
+          mt="50px"
+          display="block"
+        />
+      ) : (
+        <>
+          {showSuccess ? (
+            <CenteredAuth
+              image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+              cardTop={{ base: '140px', md: '24vh' }}
+              cardBottom={{ base: '50px', lg: 'auto' }}
+            >
+              <Flex
+                w="100%"
+                maxW="max-content"
+                mx={{ base: 'auto', lg: '0px' }}
+                me="auto"
+                h="100%"
+                justifyContent="center"
+                px={{ base: '25px', md: '0px' }}
+                flexDirection="column"
+              >
+                <Box me="auto" mb="34px">
+                  <Heading
+                    color={textColor}
+                    fontSize="36px"
+                    mb="16px"
+                    mx={{ base: 'auto', lg: 'unset' }}
+                    textAlign={{ base: 'center', lg: 'left' }}
+                  >
+                    Success!
+                  </Heading>
+                  <Text
+                    color={textColorSecondary}
+                    fontSize="md"
+                    maxW={{ base: '95%', md: '100%' }}
+                    mx={{ base: 'auto', lg: 'unset' }}
+                    textAlign={{ base: 'center', lg: 'left' }}
+                  >
+                    You have successfully verified your OTP. Thank you for registering!
+                  </Text>
+                  <Text
+                    color={textColorSecondary}
+                    fontSize="md"
+                    maxW={{ base: '95%', md: '100%' }}
+                    mx={{ base: 'auto', lg: 'unset' }}
+                    textAlign={{ base: 'center', lg: 'left' }}
+                    mt={4}
+                  >
+                    You will receive a text message with updates soon.
+                  </Text>
+                </Box>
+              </Flex>
+            </CenteredAuth>
+          ) : (
+            <CenteredAuth
+              image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+              cardTop={{ base: '140px', md: '24vh' }}
+              cardBottom={{ base: '50px', lg: 'auto' }}
+            >
+              <Flex
+                w="100%"
+                maxW="max-content"
+                mx={{ base: 'auto', lg: '0px' }}
+                me="auto"
+                h="100%"
+                justifyContent="center"
+                px={{ base: '25px', md: '0px' }}
+                flexDirection="column"
+              >
+                <Box me="auto" mb="34px">
+                  <Heading
+                    color={textColor}
+                    fontSize="36px"
+                    mb="16px"
+                    mx={{ base: 'auto', lg: 'unset' }}
+                    textAlign={{ base: 'center', lg: 'left' }}
+                  >
+                    OTP Verification
+                  </Heading>
+                  <Text
+                    color={textColorSecondary}
+                    fontSize="md"
+                    maxW={{ base: '95%', md: '100%' }}
+                    mx={{ base: 'auto', lg: 'unset' }}
+                    textAlign={{ base: 'center', lg: 'left' }}
+                  >
+                    Enter your OTP Verification code to verify!
+                  </Text>
+                </Box>
+                <Flex
+                  zIndex="2"
+                  direction="column"
+                  w={{ base: '100%', md: '425px' }}
+                  maxW="100%"
+                  background="transparent"
+                  borderRadius="15px"
+                  mx={{ base: 'auto', lg: 'unset' }}
+                  me="auto"
+                  mb={{ base: '20px', md: 'auto' }}
+                >
+                  <FormControl>
+                    <Flex justify="center">
+                      <PinInput otp>
+                        <PinInputField
+                          readOnly={isLoading}
+                          fontSize="36px"
+                          color={textColor}
+                          borderRadius="16px"
+                          borderColor={borderColor}
+                          h={{ base: '63px', md: '95px' }}
+                          w={{ base: '63px', md: '95px' }}
+                          me="10px"
+                          value={otpDigit1}
+                          onChange={handleOtpDigit1Change}
+                        />
+                        <PinInputField
+                          readOnly={isLoading}
+                          fontSize="36px"
+                          color={textColor}
+                          borderRadius="16px"
+                          borderColor={borderColor}
+                          h={{ base: '63px', md: '95px' }}
+                          w={{ base: '63px', md: '95px' }}
+                          me="10px"
+                          value={otpDigit2}
+                          onChange={handleOtpDigit2Change}
+                        />
+                        <PinInputField
+                          readOnly={isLoading}
+                          fontSize="36px"
+                          color={textColor}
+                          borderRadius="16px"
+                          borderColor={borderColor}
+                          h={{ base: '63px', md: '95px' }}
+                          w={{ base: '63px', md: '95px' }}
+                          me="10px"
+                          value={otpDigit3}
+                          onChange={handleOtpDigit3Change}
+                        />
+                        <PinInputField
+                          readOnly={isLoading}
+                          fontSize="36px"
+                          color={textColor}
+                          borderRadius="16px"
+                          borderColor={borderColor}
+                          h={{ base: '63px', md: '95px' }}
+                          w={{ base: '63px', md: '95px' }}
+                          value={otpDigit4}
+                          onChange={handleOtpDigit4Change}
+                        />
+                      </PinInput>
+                    </Flex>
+                    {error && (
+                      <FormLabel fontSize="sm" textAlign="center" color="red.500">
+                        {error}
+                      </FormLabel>
+                    )}
+                    <Button
+                      disabled={isLoadingResend}
+                      fontSize="14px"
+                      variant="brand"
+                      borderRadius="16px"
+                      fontWeight="500"
+                      w="100%"
+                      h="50"
+                      mb="24px"
+                      mt="12px"
+                      isLoading={isLoading}
+                      onClick={handleUnlock}
+                    >
+                      Verify
+
+                    </Button>
+                    {errorInvalid && (
+                      <FormLabel fontSize="sm" textAlign="center" color="red.500">
+                        {errorInvalid}
+                      </FormLabel>
+                    )}
+                  </FormControl>
+                  <Flex
+                    flexDirection="column"
+                    justifyContent="center"
+                    alignItems="start"
+                    maxW="100%"
+                    mt="0px"
+                  >
+                    <Text
+                      opacity={isLoading ? 0 : 1}
+                      color={textColorDetails}
+                      fontWeight="400"
+                      fontSize="14px"
+                      mx={{ base: 'auto', lg: 'unset' }}
+                      textAlign={{ base: 'center', lg: 'left' }}
+
+                    >
+                      Haven't received it?
+
+                      <Text onClick={handleResendCode} color={textColorBrand} style={{ cursor: 'pointer' }} as="span" ms="5px" fontWeight="500">
+                        {isLoadingResend ? "Loading..." : "Resend a new code"}
+                      </Text>
+                      {errorResend && <Text fontSize="14px" color="red">{errorResend}</Text>}
+                      {success && <Text fontSize="14px" color="green">{success}</Text>}
+                    </Text>
+                  </Flex>
+                </Flex>
+              </Flex>
+
+            </CenteredAuth>
+          )}
+        </>
+      )}
+    </>
+  );
+}
+
+export default ForgotPassword;
