@@ -328,8 +328,7 @@ export default function DashBoard() {
     setIsSingleClick(false);
   };
 
-  const handleDoubleClick = () => {
-    setIsSingleClick(false);
+  const handleLongPress = () => {
     if (number < 9) {
       setNumber(number + 1);
     } else {
@@ -369,6 +368,13 @@ export default function DashBoard() {
         icon = null;
     }
   }
+
+  const longPressEvent = useLongPress(handleLongPress, 500);
+
+  const customProps = {
+    onTouchStart: handleLongPress,
+    onMouseDown: handleLongPress,
+  };
 
   return (
     <>
@@ -529,7 +535,7 @@ export default function DashBoard() {
                           mb="5px"
                           boxShadow={shadow}
                           icon={icon}
-                          onDoubleClick={() => handleDoubleClick()}
+                          {...customProps}
                         />
                         <Text fontSize="sm" fontWeight="500" color={textColor}>
                           Subtract -1
@@ -614,4 +620,8 @@ export default function DashBoard() {
       )}
     </>
   );
+}
+
+function useLongPress(handleLongPress: any, arg1: number) {
+  throw new Error('Function not implemented.');
 }
