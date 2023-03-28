@@ -83,6 +83,7 @@ export default function DashBoard() {
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
+  const [longPressInProgress, setLongPressInProgress] = useState(false);
   const [iconIndex, setIconIndex] = useState(0);
   const icons = [
     <Icon key={1} as={RiNumber1} color={yellowIcon} w="24px" h="24px" />,
@@ -146,8 +147,8 @@ export default function DashBoard() {
   }, [isLoadingMarkAsDelivered]);
 
   const handleStockUpdate1 = async (index, action) => {
-    if (isLoadingButtons1[index]) {
-      // Stock is already being updated, do nothing
+    if (isLoadingButtons1[index] || longPressInProgress) {
+      // Stock is already being updated or a long press is in progress, do nothing
       return;
     }
 
@@ -321,20 +322,28 @@ export default function DashBoard() {
   };
 
   const handleLongPress = () => {
+    setLongPressInProgress(true);
+  
     if (number < 9) {
       setNumber(number + 1);
     } else {
       setNumber(1);
     }
-
+  
     setIconIndex((iconIndex + 1) % icons.length);
-  }
+  
+    setTimeout(() => {
+      setLongPressInProgress(false);
+    }, 1000);
+  };  
 
-  const longPressEvent = useLongPress(handleLongPress, { delay: 2000 });
+  const longPressEvent = useLongPress(handleLongPress, { delay: 1000 });
 
   const customProps = {
     onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => longPressEvent.onMouseDown(e.nativeEvent),
+    onMouseUp: () => setLongPressInProgress(false),
     onTouchStart: (e: React.TouchEvent<HTMLButtonElement>) => longPressEvent.onTouchStart(e.nativeEvent),
+    onTouchEnd: () => setLongPressInProgress(false),
   };
 
   return (
