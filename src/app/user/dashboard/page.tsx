@@ -37,7 +37,7 @@ import {
 import React, { useEffect, useState, useMemo } from 'react';
 import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
 import { MdExposureNeg1, MdAdd, MdOutlineEuroSymbol, MdOutlineEuro } from 'react-icons/md';
-import { RiNumber1,RiNumber2,RiNumber3,RiNumber4,RiNumber5,RiNumber6,RiNumber7,RiNumber8,RiNumber9 } from "react-icons/ri";
+import { RiNumber1, RiNumber2, RiNumber3, RiNumber4, RiNumber5, RiNumber6, RiNumber7, RiNumber8, RiNumber9 } from "react-icons/ri";
 import Card from 'components/card/Card';
 import axios from 'axios';
 import MiniStatistics from 'components/card/MiniStatistics';
@@ -59,7 +59,7 @@ export default function DashBoard() {
   const [isLoadingMarkAsDelivered, setIsLoadingMarkAsDelivered] = useState(false);
   const [isLoadingReset, setIsLoadingReset] = useState(false);
   const [bill, setBill] = useState(null);
-
+  const [number, setNumber] = useState(1);
 
   const boxBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.100');
   const textColor = useColorModeValue('secondaryGray.900', 'white');
@@ -84,54 +84,53 @@ export default function DashBoard() {
 
   useEffect(() => {
     setTimeout(() => {
-    setIsLoading(true);
-    if(token == null)
-    {
-      localStorage.clear();
-      router.push('/home');
-    }
-    
-    fetch(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}`, {
-      headers: {
-        "Accept" : 'application/json',
-        "x-access-token": token
+      setIsLoading(true);
+      if (token == null) {
+        localStorage.clear();
+        router.push('/home');
       }
-    })
-      .then(res => res.json())
-      .then(data => {
-        setStocks(data.stocks);
+
+      fetch(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}`, {
+        headers: {
+          "Accept": 'application/json',
+          "x-access-token": token
+        }
       })
-      .catch(err => {
-        console.error(err);
-      });
+        .then(res => res.json())
+        .then(data => {
+          setStocks(data.stocks);
+        })
+        .catch(err => {
+          console.error(err);
+        });
     }, 2000);
   }, [userId]);
 
   useEffect(() => {
     setTimeout(() => {
-    const fetchBill = async () => {
-      try {
-        const headers = {
-          "x-access-token": token,
-          "Accept" : 'application/json',
-        };
-        const response = await axios.get(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
-        setBill(response.data.bill);
-        if (response.data.bill.end) {
-          //router.push('/user/end-bill'); // Replace '/thank-you-page' with the path to your desired page
+      const fetchBill = async () => {
+        try {
+          const headers = {
+            "x-access-token": token,
+            "Accept": 'application/json',
+          };
+          const response = await axios.get(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
+          setBill(response.data.bill);
+          if (response.data.bill.end) {
+            //router.push('/user/end-bill'); // Replace '/thank-you-page' with the path to your desired page
+          }
+          //end of the bill
+          setIsLoading(false);
+        } catch (error) {
+          console.error(error);
+          setIsLoading(false);
         }
-        //end of the bill
-        setIsLoading(false);
-      } catch (error) {
-        console.error(error);
-        setIsLoading(false);
-      }
-    };
-  
-    fetchBill();
-  }, 2000);
+      };
+
+      fetchBill();
+    }, 2000);
   }, [isLoadingMarkAsDelivered]);
-  
+
 
 
   const handleStockUpdate1 = async (index, action) => {
@@ -150,7 +149,7 @@ export default function DashBoard() {
       const stock = stocks[index];
       const headers = {
         "x-access-token": token,
-        "Accept" : 'application/json',
+        "Accept": 'application/json',
       };
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, { action }, { headers });
       if (response.data.message === 'Stock updated successfully') {
@@ -190,8 +189,7 @@ export default function DashBoard() {
 
   const handleMarkAsDelivered = async () => {
 
-    if(isLoadingMarkAsDelivered)
-    {
+    if (isLoadingMarkAsDelivered) {
       return;
     }
 
@@ -199,7 +197,7 @@ export default function DashBoard() {
     try {
       const headers = {
         "x-access-token": token,
-        "Accept" : 'application/json',
+        "Accept": 'application/json',
       };
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}/mark-as-delivered`, {}, { headers });
       if (response.data.message === 'Bill marked as delivered successfully') {
@@ -221,8 +219,7 @@ export default function DashBoard() {
 
   const handleEndDay = async () => {
 
-    if(isLoadingReset)
-    {
+    if (isLoadingReset) {
       return;
     }
 
@@ -230,7 +227,7 @@ export default function DashBoard() {
     try {
       const headers = {
         "x-access-token": token,
-        "Accept" : 'application/json',
+        "Accept": 'application/json',
       };
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}/close`, { action: "close" }, { headers });
       if (response.data.message === 'Bill closed') {
@@ -257,7 +254,7 @@ export default function DashBoard() {
   const swipeHandlers = useSwipeable({
     onSwipedLeft: goToBill
   });
-  
+
 
 
   const handleStockUpdate2 = async (index, action) => {
@@ -276,7 +273,7 @@ export default function DashBoard() {
       const stock = stocks[index];
       const headers = {
         "x-access-token": token,
-        "Accept" : 'application/json',
+        "Accept": 'application/json',
       };
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, { action }, { headers });
       if (response.data.message === 'Stock updated successfully') {
@@ -312,37 +309,78 @@ export default function DashBoard() {
     }
   };
 
-  return (
-    <>
-      {isLoading ? (
-        <CenteredAuth
-          image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
-          cardTop={{ base: '140px', md: '14vh' }}
-          cardBottom={{ base: '50px', lg: '100px' }}
-          showCard={true}
-          cardSx={{ bg: 'none' }}
-        >
-          <Flex
-            w="100%"
-            maxW="max-content"
-            mx={{ base: 'auto', lg: '0px' }}
-            me="auto"
-            h="100%"
-            justifyContent="center"
-            px={{ base: '25px', md: '0px' }}
-            flexDirection="column"
+  const handleDoubleClick = () => {
+    if (number < 9) {
+      setNumber(number + 1);
+    } else {
+      setNumber(1);
+    }
+  };
+
+  let icon;
+  switch (number) {
+    case 1:
+      icon = <Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />;
+      break;
+    case 2:
+      icon = <Icon as={RiNumber2} color={yellowIcon} w="24px" h="24px" />;
+      break;
+    case 3:
+      icon = <Icon as={RiNumber3} color={yellowIcon} w="24px" h="24px" />;
+      break;
+    case 4:
+      icon = <Icon as={RiNumber4} color={yellowIcon} w="24px" h="24px" />;
+      break;
+    case 5:
+      icon = <Icon as={RiNumber5} color={yellowIcon} w="24px" h="24px" />;
+      break;
+    case 6:
+      icon = <Icon as={RiNumber6} color={yellowIcon} w="24px" h="24px" />;
+      break;
+    case 7:
+      icon = <Icon as={RiNumber7} color={yellowIcon} w="24px" h="24px" />;
+      break;
+    case 8:
+      icon = <Icon as={RiNumber8} color={yellowIcon} w="24px" h="24px" />;
+      break;
+    case 9:
+      icon = <Icon as={RiNumber9} color={yellowIcon} w="24px" h="24px" />;
+      break;
+    default:
+      icon = null;
+  }
+
+    return (
+      <>
+        {isLoading ? (
+          <CenteredAuth
+            image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+            cardTop={{ base: '140px', md: '14vh' }}
+            cardBottom={{ base: '50px', lg: '100px' }}
+            showCard={true}
+            cardSx={{ bg: 'none' }}
           >
-            <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
-            <Text mb="36px"
-              ms="4px"
-              color="white"
-              fontWeight="400"
-              fontSize="lg" textAlign='center'>
-              Loading...
-            </Text>
-          </Flex>
-        </CenteredAuth>
-      ) : (
+            <Flex
+              w="100%"
+              maxW="max-content"
+              mx={{ base: 'auto', lg: '0px' }}
+              me="auto"
+              h="100%"
+              justifyContent="center"
+              px={{ base: '25px', md: '0px' }}
+              flexDirection="column"
+            >
+              <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
+              <Text mb="36px"
+                ms="4px"
+                color="white"
+                fontWeight="400"
+                fontSize="lg" textAlign='center'>
+                Loading...
+              </Text>
+            </Flex>
+          </CenteredAuth>
+        ) : (
           <CenteredAuth
             image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
             cardTop={{ base: '140px', md: '24vh' }}
@@ -469,7 +507,8 @@ export default function DashBoard() {
                             h="56px"
                             mb="5px"
                             boxShadow={shadow}
-                            icon={<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />}
+                            icon={icon}
+                            onDoubleClick={handleDoubleClick}
                           />
                           <Text fontSize="sm" fontWeight="500" color={textColor}>
                             Subtract -1
@@ -551,7 +590,7 @@ export default function DashBoard() {
               </Card>
             </Flex>
           </CenteredAuth>
-      )}
-    </>
-  );
-}
+        )}
+      </>
+    );
+  }
