@@ -322,6 +322,8 @@ export default function DashBoard() {
   };
 
   const handleLongPress = () => {
+
+    alert('test')
     setLongPressInProgress(true);
   
     if (number < 9) {
