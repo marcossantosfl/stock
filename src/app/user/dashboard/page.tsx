@@ -324,6 +324,8 @@ export default function DashBoard() {
     if (isSingleClick) {
       handleStockUpdate1(index, 'subtract');
     }
+
+    setIsSingleClick(false);
   };
 
   const handleDoubleClick = () => {
