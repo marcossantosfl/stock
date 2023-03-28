@@ -470,7 +470,7 @@ export default function DashBoard() {
               <SimpleGrid columns={3} gap="30px" alignItems="center" justifyContent="center" textAlign="center">
                 {Array.isArray(stocks) &&
                   stocks.map((stock, index) => (
-                    <React.Fragment key={index}>
+                    <React.Fragment key={stock.id}>
                       <Flex
                         direction="column"
                         alignItems="center"
