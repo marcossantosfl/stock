@@ -370,7 +370,7 @@ export default function DashBoard() {
     }
   }
 
-  const longPressEvent = useLongPress(handleLongPress, {delay : 500});
+  const longPressEvent = useLongPress(handleLongPress, {delay : 1000});
 
   const customProps = {
     onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => longPressEvent.onMouseDown(e.nativeEvent),
