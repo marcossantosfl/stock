@@ -52,6 +52,7 @@ export default function NewUser() {
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
   useEffect(() => {
+
     if (!userId) {
       router.push('/home');
     }

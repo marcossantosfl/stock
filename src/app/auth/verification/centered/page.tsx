@@ -120,7 +120,7 @@ function ForgotPassword() {
       }
       const data = await response.json();
 
-      localStorage.setItem("accessToken", JSON.stringify(data.accessToken))
+      localStorage.setItem("accessToken", data.accessToken)
 
       // do something with the response data
       setTimeout(() => {
