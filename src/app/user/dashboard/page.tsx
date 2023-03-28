@@ -36,7 +36,7 @@ import {
 // Custom components
 import React, { useEffect, useState, useMemo } from 'react';
 import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
-import { MdExposureNeg1, MdAdd, MdOutlineEuroSymbol, MdOutlineEuro } from 'react-icons/md';
+import { MdOutlineEuroSymbol, MdOutlineEuro } from 'react-icons/md';
 import { RiNumber1, RiNumber2, RiNumber3, RiNumber4, RiNumber5, RiNumber6, RiNumber7, RiNumber8, RiNumber9 } from "react-icons/ri";
 import Card from 'components/card/Card';
 import axios from 'axios';
@@ -44,8 +44,7 @@ import MiniStatistics from 'components/card/MiniStatistics';
 import IconBox from 'components/icons/IconBox';
 import Controller from 'components/admin/dashboards/smart-home/Controller';
 import { useRouter } from 'next/navigation';
-import { useSwipeable } from 'react-swipeable';
-import { useLongPress } from "react-use";
+import Hammer from 'react-hammerjs';
 
 export default function DashBoard() {
   const router = useRouter();
@@ -60,13 +59,12 @@ export default function DashBoard() {
   const [isLoadingMarkAsDelivered, setIsLoadingMarkAsDelivered] = useState(false);
   const [isLoadingReset, setIsLoadingReset] = useState(false);
   const [bill, setBill] = useState(null);
-  const [number, setNumber] = useState(1);
-  const [isSingleClick, setIsSingleClick] = useState(false);
   const boxBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.100');
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const brandColor = useColorModeValue('brand.500', 'white');
   const yellowIcon = useColorModeValue('yellow.500', 'white');
   const bgIconButton = useColorModeValue('white', 'whiteAlpha.100');
+  const [doubleClickActive, setDoubleClickActive] = useState(false);
   const bgIconHover = useColorModeValue(
     { bg: 'gray.100' },
     { bg: 'whiteAlpha.50' }
@@ -83,7 +81,6 @@ export default function DashBoard() {
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
-  const [longPressInProgress, setLongPressInProgress] = useState(false);
   const [iconIndex, setIconIndex] = useState(0);
   const icons = [
     <Icon key={1} as={RiNumber1} color={yellowIcon} w="24px" h="24px" />,
@@ -95,7 +92,7 @@ export default function DashBoard() {
     <Icon key={7} as={RiNumber7} color={yellowIcon} w="24px" h="24px" />,
     <Icon key={8} as={RiNumber8} color={yellowIcon} w="24px" h="24px" />,
     <Icon key={9} as={RiNumber9} color={yellowIcon} w="24px" h="24px" />
-  ];  
+  ];
 
   useEffect(() => {
     setTimeout(() => {
@@ -147,7 +144,7 @@ export default function DashBoard() {
   }, [isLoadingMarkAsDelivered]);
 
   const handleStockUpdate1 = async (index, action) => {
-    if (isLoadingButtons1[index] || longPressInProgress) {
+    if (isLoadingButtons1[index]) {
       // Stock is already being updated or a long press is in progress, do nothing
       return;
     }
@@ -259,16 +256,6 @@ export default function DashBoard() {
     }
   };
 
-  const goToBill = async () => {
-    router.push('/user/end-bill');
-  };
-
-
-  const swipeHandlers = useSwipeable({
-    onSwipedLeft: goToBill
-  });
-
-
   const handleStockUpdate2 = async (index, action) => {
     if (isLoadingButtons2[index]) {
       // Stock is already being updated, do nothing
@@ -321,32 +308,20 @@ export default function DashBoard() {
     }
   };
 
-  const handleLongPress = () => {
+  const handleSingleClick = (index) => {
 
-    alert('test')
-    setLongPressInProgress(true);
-  
-    if (number < 9) {
-      setNumber(number + 1);
-    } else {
-      setNumber(1);
-    }
-  
-    setIconIndex((iconIndex + 1) % icons.length);
-  
-    setTimeout(() => {
-      setLongPressInProgress(false);
-    }, 1000);
-  };  
+    handleStockUpdate1(index, "subtract");
 
-  const longPressEvent = useLongPress(handleLongPress, { delay: 1000 });
-
-  const customProps = {
-    onMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => longPressEvent.onMouseDown(e.nativeEvent),
-    onMouseUp: () => setLongPressInProgress(false),
-    onTouchStart: (e: React.TouchEvent<HTMLButtonElement>) => longPressEvent.onTouchStart(e.nativeEvent),
-    onTouchEnd: () => setLongPressInProgress(false),
   };
+
+  const handleDoubleClick = () => {
+    changeIcon();
+  };
+
+  const changeIcon = () => {
+    setIconIndex((iconIndex + 1) % icons.length);
+  };
+
 
   return (
     <>
@@ -384,7 +359,6 @@ export default function DashBoard() {
           cardTop={{ base: '140px', md: '24vh' }}
           cardBottom={{ base: '50px', lg: 'auto' }}
           showCard={true}
-          {...swipeHandlers}
         >
           <Flex
             w="100%"
@@ -481,6 +455,7 @@ export default function DashBoard() {
               <SimpleGrid columns={3} gap="30px" alignItems="center" justifyContent="center" textAlign="center">
                 {Array.isArray(stocks) &&
                   stocks.map((stock, index) => (
+
                     <React.Fragment key={index}>
                       <Flex
                         direction="column"
@@ -489,6 +464,7 @@ export default function DashBoard() {
                         textAlign="center"
                         me={{ base: '22px', '2xl': '36px' }}
                       >
+                        <Hammer onTap={() => handleSingleClick(index)} onDoubleTap={() => handleDoubleClick()}>
                         <IconButton
                           alignItems="center"
                           justifyContent="center"
@@ -497,7 +473,8 @@ export default function DashBoard() {
                           borderRadius="50%"
                           isDisabled={isLoadingButtons1[index] || stock.amount == 0}
                           isLoading={isLoadingButtons1[index]}
-                          onClick={() => handleStockUpdate1(index, 'subtract')}
+                          onClick={() => handleSingleClick(index)}
+                          onDoubleClick={() => handleDoubleClick()}
                           bg={bgIconButton}
                           _hover={bgIconHover}
                           _active={bgIconFocus}
@@ -507,8 +484,8 @@ export default function DashBoard() {
                           mb="5px"
                           boxShadow={shadow}
                           icon={icons[iconIndex]}
-                          {...customProps}
                         />
+                        </Hammer>
                         <Text fontSize="sm" fontWeight="500" color={textColor}>
                           Subtract -1
                         </Text>
