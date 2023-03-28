@@ -134,7 +134,7 @@ export default function NewUser() {
     }
 
     try {
-      const response = await fetch("https://shark-app-u49ku.ondigitalocean.app/api/auth/stocks", {
+      const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

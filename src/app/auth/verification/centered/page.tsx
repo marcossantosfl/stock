@@ -137,7 +137,7 @@ function ForgotPassword() {
 
     try {
       setIsLoadingResend(true);
-      const response = await fetch("https://shark-app-u49ku.ondigitalocean.app/api/auth/resend", {
+      const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/resend", {
         method: "POST",
         body: JSON.stringify({ userId: userId }),
         headers: {

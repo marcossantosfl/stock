@@ -69,7 +69,7 @@ export default function DashBoard() {
         const headers = {
           "x-access-token": token
         };
-        const response = await axios.get(`https://shark-app-u49ku.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
+        const response = await axios.get(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
         setBill(response.data.bill);
         if (response.data.bill.end) {
           //router.push('/user/end-bill');
