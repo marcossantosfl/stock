@@ -68,12 +68,15 @@ function ForgotPassword() {
   const [showSuccess, setShowSuccess] = React.useState(false);
 
   useEffect(() => {
+
+    localStorage.clear();
+    
     if (!userId) {
-      setTimeout(() => {
+      //setTimeout(() => {
         router.push("/home");
-      }, 3000);
+      //}, 3000);
     }
-  }, [userId, router]);
+  }, [userId]);
 
   const handleOtpDigit1Change = (event) => {
     setOtpDigit1(event.target.value);
