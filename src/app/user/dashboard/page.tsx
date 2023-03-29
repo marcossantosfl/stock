@@ -38,7 +38,7 @@ import {
 // Custom components
 import React, { useEffect, useState } from 'react';
 import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
-import { MdAddCircle, MdAddCircleOutline, MdCached, MdDomain, MdElectricCar, MdSchool } from 'react-icons/md';
+import { MdAdd, MdAddCircle, MdAddCircleOutline, MdAddShoppingCart, MdAttachMoney, MdCached, MdClose, MdDomain, MdEditSquare, MdElectricCar, MdMoreHoriz, MdOutlineCheckCircleOutline, MdSchool } from 'react-icons/md';
 import Card from 'components/card/Card';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -51,16 +51,18 @@ export default function DashBoard() {
   const [isLoadingButtons1, setIsLoadingButtons1] = useState([]);
   const [isLoadingButtons2, setIsLoadingButtons2] = useState([]);
   const [showMarkAsDelivered, setMarkAsDelivered] = useState(false);
-  const [showReset, setReset] = useState(false);
   const [isLoadingMarkAsDelivered, setIsLoadingMarkAsDelivered] = useState(false);
   const [isLoadingReset, setIsLoadingReset] = useState(false);
   const [bill, setBill] = useState(null);
   const textColor = useColorModeValue('secondaryGray.900', 'white');
+  const iconColor = useColorModeValue('brand.500', 'white');
+  const redIcon = useColorModeValue('red.500', 'white');
+  const yellowIcon = useColorModeValue('yellow.500', 'white');
   const greenIcon = useColorModeValue('green.500', 'white');
   const ethColor = useColorModeValue('gray.700', 'white');
   const ethBg = useColorModeValue('secondaryGray.300', 'navy.900');
   const ethBox = useColorModeValue('white', 'navy.800');
-  const [selectedOption, setSelectedOption] = useState({ 0: '1' });
+  const [selectedOptions, setSelectedOptions] = useState([]);
   const options = Array.from({ length: 100 }, (_, i) => `${i + 1}`);
   const bgIconButton = useColorModeValue('white', 'whiteAlpha.100');
   const bgIconHover = useColorModeValue({ bg: 'secondaryGray.400' }, { bg: 'whiteAlpha.50' });
@@ -68,6 +70,10 @@ export default function DashBoard() {
   const shadow = useColorModeValue('18px 17px 40px 4px rgba(112, 144, 176, 0.1)', 'unset');
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
+
+  useEffect(() => {
+    setSelectedOptions(Array.from({ length: stocks.length }, () => '1'));
+  }, [stocks.length]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -136,7 +142,6 @@ export default function DashBoard() {
         setTimeout(() => {
           setIsLoadingMarkAsDelivered(false);
           setMarkAsDelivered(false);
-          setReset(true);
         }, 1000);
 
       }
@@ -198,7 +203,7 @@ export default function DashBoard() {
       };
       const data = {
         action,
-        quantity: selectedOption[index]
+        quantity: selectedOptions[index]
       };
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, data, { headers });
       if (response.data.message === 'Stock updated successfully') {
@@ -209,7 +214,7 @@ export default function DashBoard() {
               const copy = [...prev];
               const stock = copy[index];
               if (action === 'subtract') {
-                stock.amount -= selectedOption[index];
+                stock.amount -= parseInt(selectedOptions[index]);
               }
               return copy;
             });
@@ -219,7 +224,11 @@ export default function DashBoard() {
               return copy;
             });
 
-            setSelectedOption(prev => ({ ...prev, [index]: '0' }));
+            setSelectedOptions(prev => {
+              const copy = [...prev];
+              copy[index] = '1';
+              return copy;
+            });
 
             resolve();
           }, 1000))
@@ -229,7 +238,7 @@ export default function DashBoard() {
         setMarkAsDelivered(true);
       }
     } catch (error) {
-      console.error(error);
+      console.log(JSON.stringify(error));
       setTimeout(() => {
         setIsLoadingButtons1(prev => {
           const copy = [...prev];
@@ -292,9 +301,12 @@ export default function DashBoard() {
     }
   };
 
-
   const handleOptionChange = (index, value) => {
-    setSelectedOption({ ...selectedOption, [index]: value });
+    setSelectedOptions(prev => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
   };
 
   return (
@@ -336,8 +348,10 @@ export default function DashBoard() {
             justifyContent="center"
             px={{ base: '25px', md: '0px' }}
             flexDirection="column"
+            align="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center"
+            alignSelf="center"
           >
-            <Card p="30px">
+            <Card p="30px" >
               <SimpleGrid row={2} gap="10px" mb="10px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
                 <Flex
                   bg={ethBg}
@@ -408,42 +422,29 @@ export default function DashBoard() {
                   </Text>
                 </Flex>
               </SimpleGrid>
-              {showMarkAsDelivered && (
-                <Button
-                  isLoading={isLoadingMarkAsDelivered}
-                  //isDisabled={isLoadingMarkAsDelivered}
-                  mb="10px"
-                  mt="10px"
-                  onClick={() => handleMarkAsDelivered()}
-                  variant="brand"
-                  fontSize="14px"
-                  fontWeight="500"
-                  w="100%"
-                  h="50"
-                >
-                  Mark as delivered
-                </Button>
-              )}
 
               <Text mt="10px" color="secondaryGray.600" fontWeight="500" fontSize="sm" mb="10px">
                 Estoque restante
               </Text>
               {Array.isArray(stocks) &&
                 stocks.map((stock, index) => (
-                  <Flex justifyContent='center' gap="20px" mb="30px" alignItems='center' textAlign='center' justifyItems='center' w='100%'>
+                  <Flex justifyContent='center' gap="20px" mb="10px" alignItems='center' textAlign='center' justifyItems='center' w='100%'>
                     <Flex direction='column' align='center' me='auto'>
                       <Text color={textColor} fontSize='md' me='6px' fontWeight='700'>
                         {stock.name}
                       </Text>
                       <Text color='secondaryGray.600' fontSize='sm' fontWeight='500'>
-                        {stock.value * stock.amount}
+                        Qt: {stock.amount}
+                      </Text>
+                      <Text color='secondaryGray.600' fontSize='sm' fontWeight='500'>
+                        Valor: €{stock.value}
                       </Text>
                     </Flex>
-
 
                     <Flex direction='column' align='center' alignContent='center' justifyContent='center' alignItems='center' textAlign='center' justifyItems='center' w='100%'>
 
                       <Select
+                        isDisabled={stock.amount == 0}
                         ml="20px"
                         fontSize="sm"
                         id="quantity"
@@ -452,9 +453,8 @@ export default function DashBoard() {
                         maxH="44px"
                         minW="44px"
                         fontWeight="400"
-                        defaultValue={1}
                         onChange={(e) => handleOptionChange(index, e.target.value)}
-                        value={selectedOption[index]}
+                        value={selectedOptions[index]}
                       >
                         {options.map((option) => (
                           <option key={option} value={option}>
@@ -467,6 +467,7 @@ export default function DashBoard() {
 
                     <Flex ml="20px" direction='column' align='center'>
                       <IconButton
+                        isDisabled={stock.amount == 0}
                         isLoading={isLoadingButtons1[index]}
                         aria-label='transfer'
                         borderRadius='50%'
@@ -479,31 +480,81 @@ export default function DashBoard() {
                         mb='5px'
                         boxShadow={shadow}
                         onClick={(e) => handleStockUpdate1(index, 'subtract')}
-                        icon={<Icon as={MdAddCircle} color={greenIcon} w='24px' h='24px' />}
+                        icon={<Icon as={MdAddShoppingCart} color={stock.amount == 0 ? redIcon : greenIcon} w='24px' h='24px' />}
                       />
                       <Text fontSize='sm' fontWeight='500' color={textColor}>
-                        Vender
+                        {stock.amount == 0 ? 'Zerado' : 'Entregar'}
                       </Text>
                     </Flex>
                   </Flex>
                 ))}
 
-              {showReset && (
-                <Button
-                  isLoading={isLoadingReset}
-                  //isDisabled={isLoadingReset}
-                  mb="10px"
-                  mt="20px"
-                  onClick={() => handleEndDay()}
-                  variant="brand"
-                  fontSize="14px"
-                  fontWeight="500"
-                  w="100%"
-                  h="50"
-                >
-                  CLOSE STOCK.
-                </Button>
-              )}
+              <SimpleGrid columns={3} gap="10px" mt="30px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                <Flex direction='column' align='center' me={{ base: '16px', md: '0px', '2xl': '36px' }}  >
+                  <IconButton
+                    //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
+                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered}
+                    aria-label='transfer'
+                    borderRadius='50%'
+                    bg={bgIconButton}
+                    _hover={bgIconHover}
+                    _active={bgIconFocus}
+                    _focus={bgIconFocus}
+                    w='56px'
+                    h='56px'
+                    mb='5px'
+                    boxShadow={shadow}
+                    icon={<Icon as={MdEditSquare} color={iconColor} w='24px' h='24px' />}
+                  />
+                  <Text fontSize='sm' fontWeight='500' color={textColor}>
+                    Alterar
+                  </Text>
+                </Flex>
+                <Flex direction='column' align='center' me={{ base: '16px', md: '0px', '2xl': '36px' }}  >
+                  <IconButton
+                    //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
+                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered}
+                    onClick={() => handleEndDay()}
+                    aria-label='top'
+                    borderRadius='50%'
+                    bg={bgIconButton}
+                    _hover={bgIconHover}
+                    _active={bgIconFocus}
+                    _focus={bgIconFocus}
+                    w='56px'
+                    h='56px'
+                    mb='5px'
+                    boxShadow={shadow}
+                    icon={<Icon as={MdClose} color={yellowIcon} w='24px' h='24px' />}
+                  />
+                  <Text fontSize='sm' fontWeight='500' color={textColor}>
+                    Fechar
+                  </Text>
+                </Flex>
+                {showMarkAsDelivered && (
+                  <Flex direction='column' align='center' me={{ base: '16px', md: '0px', '2xl': '36px' }} >
+                    <IconButton
+                      isLoading={isLoadingMarkAsDelivered}
+                      isDisabled={isLoadingMarkAsDelivered}
+                      onClick={() => handleMarkAsDelivered()}
+                      aria-label='top'
+                      borderRadius='50%'
+                      bg={bgIconButton}
+                      _hover={bgIconHover}
+                      _active={bgIconFocus}
+                      _focus={bgIconFocus}
+                      w='56px'
+                      h='56px'
+                      mb='5px'
+                      boxShadow={shadow}
+                      icon={<Icon as={MdOutlineCheckCircleOutline} color={greenIcon} w='24px' h='24px' />}
+                    />
+                    <Text fontSize='sm' fontWeight='500' color={textColor}>
+                      Entreguei
+                    </Text>
+                  </Flex>
+                )}
+              </SimpleGrid>
             </Card>
           </Flex>
         </CenteredAuth>
