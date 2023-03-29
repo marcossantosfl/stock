@@ -428,7 +428,7 @@ export default function DashBoard() {
               </Text>
               {Array.isArray(stocks) &&
                 stocks.map((stock, index) => (
-                  <Flex justifyContent='center' gap="20px" mb="10px" alignItems='center' textAlign='center' justifyItems='center' w='100%'>
+                  <Flex key={stock.id} justifyContent='center' gap="20px" mb="10px" alignItems='center' textAlign='center' justifyItems='center' w='100%'>
                     <Flex direction='column' align='center' me='auto'>
                       <Text color={textColor} fontSize='md' me='6px' fontWeight='700'>
                         {stock.name}
