@@ -106,7 +106,7 @@ export default function AuthNavbar(props: {
           style={{ maxWidth: 'max-content' }}
         >
         <Text fontSize="sm" color={mainText}>
-        Login
+        Acessar Minha Conta
         </Text>
         </Link>
       </Stack>
@@ -123,7 +123,7 @@ export default function AuthNavbar(props: {
       >
         <Link href="#" onClick={handleLogout} style={{ maxWidth: 'max-content' }}>
           <Text fontSize="sm" color={mainText}>
-            Logout
+            Deslogar
           </Text>
         </Link>
       </Stack>
@@ -174,7 +174,7 @@ export default function AuthNavbar(props: {
                 lg: 'flex',
               }}
             >
-              Register Now
+              Cadastrar
             </Button>
           </Link>
           )}

@@ -8,7 +8,7 @@ import { IRoute } from 'types/navigation';
 
 const routes: IRoute[] = [
   {
-    name: 'Login',
+    name: 'Acessar Minha Conta',
     path: '/auth/sign-in/centered',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     collapse: false,
@@ -17,7 +17,7 @@ const routes: IRoute[] = [
     ],
   },
   {
-    name: 'Register',
+    name: 'Cadastrar',
     path: '/auth/sign-up/centered',
     icon: <Icon as={MdHome} width="20px" height="20px" color="inherit" />,
     collapse: false,

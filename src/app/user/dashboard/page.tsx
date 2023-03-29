@@ -32,19 +32,17 @@ import {
   Button,
   Icon,
   Box,
+  Select,
+  FormLabel,
 } from '@chakra-ui/react';
 // Custom components
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
-import { MdOutlineEuroSymbol, MdOutlineEuro } from 'react-icons/md';
-import { RiNumber1, RiNumber2, RiNumber3, RiNumber4, RiNumber5, RiNumber6, RiNumber7, RiNumber8, RiNumber9 } from "react-icons/ri";
+import { MdAddCircle, MdAddCircleOutline, MdCached, MdDomain, MdElectricCar, MdSchool } from 'react-icons/md';
 import Card from 'components/card/Card';
 import axios from 'axios';
-import MiniStatistics from 'components/card/MiniStatistics';
-import IconBox from 'components/icons/IconBox';
-import Controller from 'components/admin/dashboards/smart-home/Controller';
 import { useRouter } from 'next/navigation';
-import Hammer from 'react-hammerjs';
+import { FaEthereum } from 'react-icons/fa';
 
 export default function DashBoard() {
   const router = useRouter();
@@ -52,47 +50,24 @@ export default function DashBoard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingButtons1, setIsLoadingButtons1] = useState([]);
   const [isLoadingButtons2, setIsLoadingButtons2] = useState([]);
-  const [showEarnings, setShowEarnings] = useState(true);
-  const [showToPay, setToPay] = useState(true);
   const [showMarkAsDelivered, setMarkAsDelivered] = useState(false);
   const [showReset, setReset] = useState(false);
   const [isLoadingMarkAsDelivered, setIsLoadingMarkAsDelivered] = useState(false);
   const [isLoadingReset, setIsLoadingReset] = useState(false);
   const [bill, setBill] = useState(null);
-  const boxBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.100');
   const textColor = useColorModeValue('secondaryGray.900', 'white');
-  const brandColor = useColorModeValue('brand.500', 'white');
-  const yellowIcon = useColorModeValue('yellow.500', 'white');
+  const greenIcon = useColorModeValue('green.500', 'white');
+  const ethColor = useColorModeValue('gray.700', 'white');
+  const ethBg = useColorModeValue('secondaryGray.300', 'navy.900');
+  const ethBox = useColorModeValue('white', 'navy.800');
+  const [selectedOption, setSelectedOption] = useState({ 0: '1' });
+  const options = Array.from({ length: 100 }, (_, i) => `${i + 1}`);
   const bgIconButton = useColorModeValue('white', 'whiteAlpha.100');
-  const [doubleClickActive, setDoubleClickActive] = useState(false);
-  const bgIconHover = useColorModeValue(
-    { bg: 'gray.100' },
-    { bg: 'whiteAlpha.50' }
-  );
-  const bgIconFocus = useColorModeValue(
-    { bg: 'grey.100' },
-    { bg: 'whiteAlpha.100' }
-  );
-  const shadow = useColorModeValue(
-    '18px 17px 40px 4px rgba(112, 144, 176, 0.1)',
-    'unset'
-  );
-
+  const bgIconHover = useColorModeValue({ bg: 'secondaryGray.400' }, { bg: 'whiteAlpha.50' });
+  const bgIconFocus = useColorModeValue({ bg: 'white' }, { bg: 'whiteAlpha.100' });
+  const shadow = useColorModeValue('18px 17px 40px 4px rgba(112, 144, 176, 0.1)', 'unset');
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
-
-  const [iconIndex, setIconIndex] = useState(0);
-  const icons = [
-    <Icon key={1} as={RiNumber1} color={yellowIcon} w="24px" h="24px" />,
-    <Icon key={2} as={RiNumber2} color={yellowIcon} w="24px" h="24px" />,
-    <Icon key={3} as={RiNumber3} color={yellowIcon} w="24px" h="24px" />,
-    <Icon key={4} as={RiNumber4} color={yellowIcon} w="24px" h="24px" />,
-    <Icon key={5} as={RiNumber5} color={yellowIcon} w="24px" h="24px" />,
-    <Icon key={6} as={RiNumber6} color={yellowIcon} w="24px" h="24px" />,
-    <Icon key={7} as={RiNumber7} color={yellowIcon} w="24px" h="24px" />,
-    <Icon key={8} as={RiNumber8} color={yellowIcon} w="24px" h="24px" />,
-    <Icon key={9} as={RiNumber9} color={yellowIcon} w="24px" h="24px" />
-  ];
 
   useEffect(() => {
     setTimeout(() => {
@@ -142,60 +117,6 @@ export default function DashBoard() {
       fetchBill();
     }, 2000);
   }, [isLoadingMarkAsDelivered]);
-
-  const handleStockUpdate1 = async (index, action) => {
-    if (isLoadingButtons1[index]) {
-      // Stock is already being updated or a long press is in progress, do nothing
-      return;
-    }
-
-    setIsLoadingButtons1(prev => {
-      const copy = [...prev];
-      copy[index] = true;
-      return copy;
-    });
-
-    try {
-      const stock = stocks[index];
-      const headers = {
-        "x-access-token": token,
-        "Accept": 'application/json',
-      };
-      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, { action }, { headers });
-      if (response.data.message === 'Stock updated successfully') {
-        await Promise.all([
-          new Promise(resolve => setTimeout(resolve, 1000)),
-          new Promise<void>(resolve => setTimeout(() => {
-            setStocks(prev => {
-              const copy = [...prev];
-              const stock = copy[index];
-              if (action === 'subtract') {
-                stock.amount -= 1;
-              }
-              return copy;
-            });
-            setIsLoadingButtons1(prev => {
-              const copy = [...prev];
-              copy[index] = false;
-              return copy;
-            });
-            resolve();
-          }, 1000))
-        ]);
-
-        setMarkAsDelivered(true);
-      }
-    } catch (error) {
-      console.error(error);
-      setTimeout(() => {
-        setIsLoadingButtons1(prev => {
-          const copy = [...prev];
-          copy[index] = false;
-          return copy;
-        });
-      }, 1000);
-    }
-  };
 
   const handleMarkAsDelivered = async () => {
 
@@ -256,6 +177,69 @@ export default function DashBoard() {
     }
   };
 
+
+  const handleStockUpdate1 = async (index, action) => {
+    if (isLoadingButtons1[index]) {
+      // Stock is already being updated or a long press is in progress, do nothing
+      return;
+    }
+
+    setIsLoadingButtons1(prev => {
+      const copy = [...prev];
+      copy[index] = true;
+      return copy;
+    });
+
+    try {
+      const stock = stocks[index];
+      const headers = {
+        "x-access-token": token,
+        "Accept": 'application/json',
+      };
+      const data = {
+        action,
+        quantity: selectedOption[index]
+      };
+      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, data, { headers });
+      if (response.data.message === 'Stock updated successfully') {
+        await Promise.all([
+          new Promise(resolve => setTimeout(resolve, 1000)),
+          new Promise<void>(resolve => setTimeout(() => {
+            setStocks(prev => {
+              const copy = [...prev];
+              const stock = copy[index];
+              if (action === 'subtract') {
+                stock.amount -= selectedOption[index];
+              }
+              return copy;
+            });
+            setIsLoadingButtons1(prev => {
+              const copy = [...prev];
+              copy[index] = false;
+              return copy;
+            });
+
+            setSelectedOption(prev => ({ ...prev, [index]: '0' }));
+
+            resolve();
+          }, 1000))
+        ]);
+
+
+        setMarkAsDelivered(true);
+      }
+    } catch (error) {
+      console.error(error);
+      setTimeout(() => {
+        setIsLoadingButtons1(prev => {
+          const copy = [...prev];
+          copy[index] = false;
+          return copy;
+        });
+      }, 1000);
+    }
+  };
+
   const handleStockUpdate2 = async (index, action) => {
     if (isLoadingButtons2[index]) {
       // Stock is already being updated, do nothing
@@ -308,20 +292,10 @@ export default function DashBoard() {
     }
   };
 
-  const handleSingleClick = (index) => {
 
-    handleStockUpdate1(index, "subtract");
-
+  const handleOptionChange = (index, value) => {
+    setSelectedOption({ ...selectedOption, [index]: value });
   };
-
-  const handleDoubleClick = () => {
-    changeIcon();
-  };
-
-  const changeIcon = () => {
-    setIconIndex((iconIndex + 1) % icons.length);
-  };
-
 
   return (
     <>
@@ -344,13 +318,6 @@ export default function DashBoard() {
             flexDirection="column"
           >
             <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
-            <Text mb="36px"
-              ms="4px"
-              color="white"
-              fontWeight="400"
-              fontSize="lg" textAlign='center'>
-              Loading...
-            </Text>
           </Flex>
         </CenteredAuth>
       ) : (
@@ -371,70 +338,75 @@ export default function DashBoard() {
             flexDirection="column"
           >
             <Card p="30px">
-              <SimpleGrid row={4} gap="10px" mb="10px" alignItems="center" alignContent="center" justifyContent="center" justifyItems="center">
-                {showEarnings && bill !== null && (
-                  <MiniStatistics
-                    startContent={
-                      <IconBox
-                        w="56px"
-                        h="56px"
-                        bg={boxBg}
-                        icon={
-                          <Icon
-                            w="32px"
-                            h="32px"
-                            as={MdOutlineEuroSymbol}
-                            color={brandColor}
-                          />
-                        }
-                      />
-                    }
-                    name="Your Earnings"
-                    value={`€${bill.earn}`}
-                  />
-                )}
-                {showToPay && bill !== null && (
-                  <MiniStatistics
-                    startContent={
-                      <IconBox
-                        w="56px"
-                        h="56px"
-                        bg={boxBg}
-                        icon={
-                          <Icon
-                            w="32px"
-                            h="32px"
-                            as={MdOutlineEuroSymbol}
-                            color={brandColor}
-                          />
-                        }
-                      />
-                    }
-                    name="To Pay"
-                    value={`€${bill.toPayTotal}`}
-                  />
-                )}
-
-                <SimpleGrid columns={2} gap="20px">
-                  <Box onClick={() => setShowEarnings(!showEarnings)}>
-                    <Controller
-                      initial={true}
-                      text="Show My Earnings"
-                      onValue="ON"
-                      offValue="OFF"
-                      icon={MdOutlineEuroSymbol}
-                    />
-                  </Box>
-                  <Box onClick={() => setToPay(!showToPay)}>
-                    <Controller
-                      initial={true}
-                      text="Show To Pay"
-                      onValue="ON"
-                      offValue="OFF"
-                      icon={MdOutlineEuro}
-                    />
-                  </Box>
-                </SimpleGrid>
+              <SimpleGrid row={2} gap="10px" mb="10px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                <Flex
+                  bg={ethBg}
+                  display='flex'
+                  borderRadius="30px"
+                  ms="auto"
+                  p="6px"
+                  align="center"
+                  me="6px"
+                >
+                  <Flex
+                    align="center"
+                    justify="center"
+                    bg={ethBox}
+                    h="29px"
+                    w="29px"
+                    borderRadius="30px"
+                    me="7px"
+                  >
+                    <Icon color={ethColor} w="9px" h="14px" as={FaEthereum} />
+                  </Flex>
+                  <Text
+                    w="max-content"
+                    color={ethColor}
+                    fontSize="sm"
+                    fontWeight="700"
+                    me="6px"
+                  >
+                    {`Ganhos ${bill.earn}`}
+                    <Text as="span" display={{ base: 'none', md: 'unset' }}>
+                      {' '}
+                      €
+                    </Text>
+                  </Text>
+                </Flex>
+                <Flex
+                  bg={ethBg}
+                  display='flex'
+                  borderRadius="30px"
+                  ms="auto"
+                  p="6px"
+                  align="center"
+                  me="6px"
+                >
+                  <Flex
+                    align="center"
+                    justify="center"
+                    bg={ethBox}
+                    h="29px"
+                    w="29px"
+                    borderRadius="30px"
+                    me="7px"
+                  >
+                    <Icon color={ethColor} w="9px" h="14px" as={FaEthereum} />
+                  </Flex>
+                  <Text
+                    w="max-content"
+                    color={ethColor}
+                    fontSize="sm"
+                    fontWeight="700"
+                    me="6px"
+                  >
+                    {`A Pagar ${bill.toPayTotal}`}
+                    <Text as="span" display={{ base: 'none', md: 'unset' }}>
+                      {' '}
+                      €
+                    </Text>
+                  </Text>
+                </Flex>
               </SimpleGrid>
               {showMarkAsDelivered && (
                 <Button
@@ -452,98 +424,70 @@ export default function DashBoard() {
                   Mark as delivered
                 </Button>
               )}
-              <SimpleGrid columns={3} gap="30px" alignItems="center" justifyContent="center" textAlign="center">
-                {Array.isArray(stocks) &&
-                  stocks.map((stock, index) => (
 
-                    <React.Fragment key={index}>
-                      <Flex
-                        direction="column"
-                        alignItems="center"
-                        justifyContent="center"
-                        textAlign="center"
-                        me={{ base: '22px', '2xl': '36px' }}
+              <Text mt="10px" color="secondaryGray.600" fontWeight="500" fontSize="sm" mb="10px">
+                Estoque restante
+              </Text>
+              {Array.isArray(stocks) &&
+                stocks.map((stock, index) => (
+                  <Flex justifyContent='center' gap="20px" mb="30px" alignItems='center' textAlign='center' justifyItems='center' w='100%'>
+                    <Flex direction='column' align='center' me='auto'>
+                      <Text color={textColor} fontSize='md' me='6px' fontWeight='700'>
+                        {stock.name}
+                      </Text>
+                      <Text color='secondaryGray.600' fontSize='sm' fontWeight='500'>
+                        {stock.value * stock.amount}
+                      </Text>
+                    </Flex>
+
+
+                    <Flex direction='column' align='center' alignContent='center' justifyContent='center' alignItems='center' textAlign='center' justifyItems='center' w='100%'>
+
+                      <Select
+                        ml="20px"
+                        fontSize="sm"
+                        id="quantity"
+                        variant="main"
+                        h="44px"
+                        maxH="44px"
+                        minW="44px"
+                        fontWeight="400"
+                        defaultValue={1}
+                        onChange={(e) => handleOptionChange(index, e.target.value)}
+                        value={selectedOption[index]}
                       >
-                        <Hammer onTap={() => handleSingleClick(index)} onDoubleTap={() => handleDoubleClick()}>
-                        <IconButton
-                          alignItems="center"
-                          justifyContent="center"
-                          textAlign="center"
-                          aria-label="Top"
-                          borderRadius="50%"
-                          isDisabled={isLoadingButtons1[index] || stock.amount == 0}
-                          isLoading={isLoadingButtons1[index]}
-                          onClick={() => handleSingleClick(index)}
-                          onDoubleClick={() => handleDoubleClick()}
-                          bg={bgIconButton}
-                          _hover={bgIconHover}
-                          _active={bgIconFocus}
-                          _focus={bgIconFocus}
-                          w="56px"
-                          h="56px"
-                          mb="5px"
-                          boxShadow={shadow}
-                          icon={icons[iconIndex]}
-                        />
-                        </Hammer>
-                        <Text fontSize="sm" fontWeight="500" color={textColor}>
-                          Subtract -1
-                        </Text>
-                      </Flex>
-                      <Flex
-                        direction="column"
-                        alignItems="center"
-                        justifyContent="center"
-                        textAlign="center"
-                        me={{ base: '22px', '2xl': '36px' }}
-                      >
-                        <Text color={textColor} fontSize="24px" fontWeight="700">
-                          €{stock.amount * stock.value}
-                        </Text>
-                        <Text
-                          alignItems="center"
-                          justifyContent="center"
-                          textAlign="center"
-                          w="max-content"
-                          mb="10px"
-                          fontSize="md"
-                          p="6px 12px"
-                          bg="linear-gradient(108.54deg, #FF416C 6.56%, #FF4B2B 95.2%)"
-                          color="white"
-                          borderRadius="10px"
-                          fontWeight="700"
-                        >
-                          {stock.name}
-                        </Text>
-                      </Flex>
-                      <Flex
-                        direction="column"
-                        align="center"
-                        me={{ base: '22px', '2xl': '36px' }}
-                      >
-                        <IconButton
-                          aria-label="Top"
-                          borderRadius="50%"
-                          isDisabled={isLoadingButtons2[index]}
-                          isLoading={isLoadingButtons2[index]}
-                          onClick={() => handleStockUpdate2(index, 'add')}
-                          bg={bgIconButton}
-                          _hover={bgIconHover}
-                          _active={bgIconFocus}
-                          _focus={bgIconFocus}
-                          w="56px"
-                          h="56px"
-                          mb="5px"
-                          boxShadow={shadow}
-                          icon={<Icon as={RiNumber1} color={yellowIcon} w="24px" h="24px" />}
-                        />
-                        <Text fontSize="sm" fontWeight="500" color={textColor}>
-                          Top Up
-                        </Text>
-                      </Flex>
-                    </React.Fragment>
-                  ))}
-              </SimpleGrid>
+                        {options.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </Select>
+                    </Flex>
+
+
+                    <Flex ml="20px" direction='column' align='center'>
+                      <IconButton
+                        isLoading={isLoadingButtons1[index]}
+                        aria-label='transfer'
+                        borderRadius='50%'
+                        bg={bgIconButton}
+                        _hover={bgIconHover}
+                        _active={bgIconFocus}
+                        _focus={bgIconFocus}
+                        w='56px'
+                        h='56px'
+                        mb='5px'
+                        boxShadow={shadow}
+                        onClick={(e) => handleStockUpdate1(index, 'subtract')}
+                        icon={<Icon as={MdAddCircle} color={greenIcon} w='24px' h='24px' />}
+                      />
+                      <Text fontSize='sm' fontWeight='500' color={textColor}>
+                        Vender
+                      </Text>
+                    </Flex>
+                  </Flex>
+                ))}
+
               {showReset && (
                 <Button
                   isLoading={isLoadingReset}
