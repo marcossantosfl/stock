@@ -629,7 +629,7 @@ export default function DashBoard() {
               {Array.isArray(stocks) &&
                 stocks.map((stock, index) => (
 
-                  <SimpleGrid columns={3} gap="10px" mt="30px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                  <SimpleGrid key={index}  columns={3} gap="10px" mt="30px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
 
                     <Flex direction='column' align='center' me='auto'>
                       <Text color={textColor} fontSize='md' me='6px' fontWeight='700'>
@@ -786,7 +786,7 @@ export default function DashBoard() {
                     {Array.isArray(cart) &&
                       cart.map((cart, index) => (
 
-                        <Flex justifyContent="center" alignItems="center" w="100%" >
+                        <Flex key={index} justifyContent="center" alignItems="center" w="100%" >
                           <Flex direction="column" align="center" me="auto">
                             <Text color={textColor} fontSize="md" me="6px" fontWeight="700">
                               {cart.name}
