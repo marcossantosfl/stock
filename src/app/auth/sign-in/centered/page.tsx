@@ -103,22 +103,22 @@ const SignIn = () => {
     if (isLoading) {
       return;
     }
-  
+
     let error = false;
-  
+
     if (!isValidNumber(phoneNumber)) {
       setError("Invalid phone number");
       error = true;
     } else {
       setError(null);
     }
-  
+
     setIsLoading(true);
     setErrorUser("");
-  
+
     if (!error) {
       try {
-        const response = await fetch("http://localhost:8080/api/auth/login", {
+        const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/login", {
           method: "POST",
           body: JSON.stringify({
             phoneNumber: phoneNumber,
@@ -127,25 +127,25 @@ const SignIn = () => {
             "Content-Type": "application/json",
           },
         });
-  
+
         if (response.status === 404) {
           setErrorUser("User not found");
           throw new Error("HTTP error " + response.status);
         }
-  
+
         if (response.status === 500) {
           setErrorUser("SMS not sent");
           throw new Error("HTTP error " + response.status);
         }
-  
+
         if (!response.ok) {
           throw new Error("HTTP error " + response.status);
         }
-  
+
         const data = await response.json();
-  
+
         localStorage.setItem("userId", JSON.stringify(data.userId));
-  
+
         setTimeout(() => {
           router.push("/auth/verification/centered");
         }, 1000);
@@ -154,7 +154,7 @@ const SignIn = () => {
         setIsLoading(false);
       }
     }
-  };  
+  };
 
   return (
     <>
@@ -180,7 +180,7 @@ const SignIn = () => {
               color="white"
               fontWeight="400"
               fontSize="lg" textAlign='center'>
-              Loading...
+              Carregando...
             </Text>
           </Flex>
         </CenteredAuth>
@@ -204,7 +204,7 @@ const SignIn = () => {
                 fontSize={{ base: '34px', lg: '36px' }}
                 mb="10px"
               >
-                Login
+                Minha Conta
               </Heading>
               <Text
                 mb="36px"
@@ -213,7 +213,7 @@ const SignIn = () => {
                 fontWeight="400"
                 fontSize="md"
               >
-                Enter your phone number.
+                Digite o numero do seu celular.
               </Text>
             </Box>
             <Flex
@@ -235,14 +235,14 @@ const SignIn = () => {
                   color={textColor}
                   display="flex"
                 >
-                  Phone Number<Text color={brandStars}>*</Text>
+                  Celular<Text color={brandStars}>*</Text>
                 </FormLabel>
                 <InputGroup size="md">
                   <PhoneNumberInput
                     isDisabled={isLoading}
                     isRequired={true}
                     size="lg"
-                    type="tel" placeholder="phone number" borderRadius="16px"
+                    type="tel" placeholder="083xxxxxxx" borderRadius="16px"
                     value={phoneNumber}
                     options={countryOptions}
                     onChange={phoneNumber => handlePhoneNumberChange(phoneNumber)} country={undefined}
@@ -270,7 +270,7 @@ const SignIn = () => {
                   //isDisabled={isLoading}
                   onClick={handleLogin}
                 >
-                  Login
+                  Acessar
                 </Button>
               </FormControl>
               <Flex
@@ -281,7 +281,7 @@ const SignIn = () => {
                 mt="0px"
               >
                 <Text color={textColorDetails} fontWeight="400" fontSize="sm">
-                  Don't you have an account?
+                  Você já tem uma conta?
                   <Link href="/auth/sign-up/centered">
                     <Text
                       color={textColorBrand}
@@ -289,7 +289,7 @@ const SignIn = () => {
                       ms="5px"
                       fontWeight="500"
                     >
-                      Sign up
+                      Cadastrar
                     </Text>
                   </Link>
                 </Text>

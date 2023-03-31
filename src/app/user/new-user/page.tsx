@@ -118,7 +118,7 @@ export default function NewUser() {
       setIsLoading(false);
       setError("");
       setStocks([...stocks, { name: currentStock, value: currentAmount, amount: Number(selectedOption) }]);
-      localStorage.setItem("stocks", JSON.stringify(stocks));
+      localStorage.setItem("stocks", JSON.stringify([...stocks, { name: currentStock, value: currentAmount, amount: Number(selectedOption) }]));
     }, 1000);
   };
 
@@ -130,54 +130,49 @@ export default function NewUser() {
   };
 
   const handleSubmit = async () => {
-
-    if(isSubmitted)
-    {
+    if (isSubmitted) {
       return;
     }
-
+  
     setIisSubmitted(true);
-    setErrorRequest('')
-
+    setErrorRequest('');
+  
     if (!stocks || stocks.length === 0) {
-      setError("You must add at least one stock");
+      setError('You must add at least one stock');
       setIisSubmitted(false);
       return;
     }
-
+  
     try {
-      const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks", {
-        method: "POST",
+      const response = await fetch('https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          "x-access-token": token
+          'Content-Type': 'application/json',
+          'x-access-token': token,
         },
         body: JSON.stringify({
           stocks: stocks,
           userId: userId,
-        })
+        }),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to create stocks");
-
-      }
+  
       const data = await response.json();
-
+      if (!response.ok) {
+        throw new Error('Failed to create stocks');
+      }
+  
       setTimeout(() => {
-        router.push("/user/dashboard");
-        //setIisSubmitted(false);
+        router.push('/user/dashboard');
       }, 1000);
-
     } catch (error) {
-      console.error(error);
+      console.log(error);
       setTimeout(() => {
-        setErrorRequest('Fail to create a stock.')
+        setErrorRequest('Fail to create a stock.');
         setIisSubmitted(false);
       }, 1000);
     }
   };
-
+  
 
   return (
     <CenteredAuth

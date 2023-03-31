@@ -97,14 +97,14 @@ const SignUp = () => {
       setError(null);
       setphoneNumber(phoneNumber);
     } else {
-      setError("Invalid phone number");
+      setError("Celular inválido");
     }
   };
 
   const handleCheckboxChange = () => {
     setIsChecked(!isChecked);
     if (isChecked) {
-      setErrorAgree("You must agree to the Terms and Conditions and Privacy Policy");
+      setErrorAgree("Você deve aceitar os termos, condições  e a política de privacidade");
     } else {
       setErrorAgree(null);
     }
@@ -112,22 +112,21 @@ const SignUp = () => {
 
   const handleCreateAccount = async () => {
 
-    if(isLoading)
-    {
+    if (isLoading) {
       return;
     }
-    
+
     let error = false;
 
     if (!isChecked) {
-      setErrorAgree("You must agree to the Terms and Conditions and Privacy Policy");
+      setErrorAgree("Você deve aceitar os termos, condições  e a política de privacidade");
       error = true;
     } else {
       setErrorAgree(null);
     }
 
     if (!isValidNumber(phoneNumber)) {
-      setError("Invalid phone number");
+      setError("Celular inválido");
       error = true;
     } else {
       setError(null);
@@ -150,7 +149,7 @@ const SignUp = () => {
         });
 
         if (response.status === 400) {
-          setErrorUser("This phone number is already registered");
+          setErrorUser("Numero ja registrado.");
           throw new Error("HTTP error " + response.status);
         }
 
@@ -196,7 +195,7 @@ const SignUp = () => {
               color="white"
               fontWeight="400"
               fontSize="lg" textAlign='center'>
-              Loading...
+              Carregando...
             </Text>
           </Flex>
         </CenteredAuth>
@@ -220,17 +219,8 @@ const SignUp = () => {
                 fontSize={{ base: '34px', lg: '36px' }}
                 mb="10px"
               >
-                Sign Up
+                Cadastrar
               </Heading>
-              <Text
-                mb="36px"
-                ms="4px"
-                color={textColorSecondary}
-                fontWeight="400"
-                fontSize="md"
-              >
-                Enter your phone number.
-              </Text>
             </Box>
             <Flex
               zIndex="2"
@@ -251,7 +241,7 @@ const SignUp = () => {
                   color={textColor}
                   display="flex"
                 >
-                  Phone Number<Text color={brandStars}>*</Text>
+                  Numero do celular<Text color={brandStars}>*</Text>
                 </FormLabel>
                 <InputGroup size="md">
                   <PhoneNumberInput
@@ -288,19 +278,19 @@ const SignUp = () => {
                       color={textColor}
                       fontSize="sm"
                     >
-                      By creating an account means you agree to the{' '}
+                      Ao criar uma conta significa que você concorda com os {' '}
                       <Link
                         href="https://simmmple.com/terms-of-service"
                         fontWeight="500"
                       >
-                        Terms and Conditions,
+                        Termos e Condições,
                       </Link>{' '}
-                      and our{' '}
+                      e nossa{' '}
                       <Link
                         href="https://simmmple.com/privacy-policy"
                         fontWeight="500"
                       >
-                        Privacy Policy
+                        Política de Privacidade
                       </Link>
                     </FormLabel>
                   </FormControl>
@@ -328,7 +318,7 @@ const SignUp = () => {
                   //isDisabled={isLoading}
                   onClick={handleCreateAccount}
                 >
-                  Create my account
+                  Criar conta
                 </Button>
               </FormControl>
               <Flex
@@ -339,7 +329,7 @@ const SignUp = () => {
                 mt="0px"
               >
                 <Text color={textColorDetails} fontWeight="400" fontSize="sm">
-                  Already a member?
+                Já possui uma conta?
                   <Link href="/auth/sign-in/centered">
                     <Text
                       color={textColorBrand}
@@ -347,7 +337,7 @@ const SignUp = () => {
                       ms="5px"
                       fontWeight="500"
                     >
-                      Sign in
+                      Acessar
                     </Text>
                   </Link>
                 </Text>

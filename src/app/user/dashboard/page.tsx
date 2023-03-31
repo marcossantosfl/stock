@@ -20,7 +20,6 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-
 // Chakra imports
 import {
   Flex,
@@ -34,11 +33,21 @@ import {
   Box,
   Select,
   FormLabel,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  Badge,
+  Stack,
 } from '@chakra-ui/react';
 // Custom components
 import React, { useEffect, useState } from 'react';
 import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
-import { MdAdd, MdAddCircle, MdAddCircleOutline, MdAddShoppingCart, MdAttachMoney, MdCached, MdClose, MdDomain, MdEditSquare, MdElectricCar, MdMoreHoriz, MdOutlineCheckCircleOutline, MdSchool } from 'react-icons/md';
+import { MdAdd, MdAddCircle, MdAddCircleOutline, MdAddShoppingCart, MdAttachMoney, MdCached, MdClose, MdDomain, MdEditSquare, MdElectricCar, MdMoreHoriz, MdOutlineCheckCircleOutline, MdRemoveRedEye, MdSchool } from 'react-icons/md';
 import Card from 'components/card/Card';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -70,6 +79,23 @@ export default function DashBoard() {
   const shadow = useColorModeValue('18px 17px 40px 4px rgba(112, 144, 176, 0.1)', 'unset');
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [cart, setCart] = useState([]);
+
+  //localStorage.removeItem('Cart')
+
+  // Load the cart data from local storage when the component mounts
+  useEffect(() => {
+    const storedCart = typeof localStorage !== 'undefined' ? localStorage.getItem("Cart") : null;
+    if (storedCart) {
+      setCart(JSON.parse(storedCart));
+    }
+  }, []);
+
+  // Update the local storage whenever the Cart state changes
+  useEffect(() => {
+    typeof localStorage !== 'undefined' ? localStorage.setItem('Cart', JSON.stringify(cart)) : null;
+  }, [cart]);
 
   useEffect(() => {
     setSelectedOptions(Array.from({ length: stocks.length }, () => '1'));
@@ -124,7 +150,7 @@ export default function DashBoard() {
     }, 2000);
   }, [isLoadingMarkAsDelivered]);
 
-  const handleMarkAsDelivered = async () => {
+  const handleCloseCart = async () => {
 
     if (isLoadingMarkAsDelivered) {
       return;
@@ -136,8 +162,9 @@ export default function DashBoard() {
         "x-access-token": token,
         "Accept": 'application/json',
       };
-      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}/mark-as-delivered`, {}, { headers });
-      if (response.data.message === 'Bill marked as delivered successfully') {
+      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/close`, {}, { headers });
+      if (response.data.message === 'Cart closed successfully') {
+        alert('okay')
         // Do something after the bill has been marked as delivered
         setTimeout(() => {
           setIsLoadingMarkAsDelivered(false);
@@ -146,7 +173,7 @@ export default function DashBoard() {
 
       }
     } catch (error) {
-      console.error(JSON.stringify(error));
+      alert(JSON.stringify(error));
       setTimeout(() => {
         setIsLoadingMarkAsDelivered(false);
       }, 1000);
@@ -183,7 +210,7 @@ export default function DashBoard() {
   };
 
 
-  const handleStockUpdate1 = async (index, action) => {
+  const handleCartCreate = async (index) => {
     if (isLoadingButtons1[index]) {
       // Stock is already being updated or a long press is in progress, do nothing
       return;
@@ -201,23 +228,24 @@ export default function DashBoard() {
         "x-access-token": token,
         "Accept": 'application/json',
       };
+
       const data = {
-        action,
-        quantity: selectedOptions[index]
+        quantity: selectedOptions[index],
+        stockId: stock.id,
       };
-      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, data, { headers });
-      if (response.data.message === 'Stock updated successfully') {
+
+      const existingCartItem = cart.find(item => item.stockId === stock.id);
+      if (existingCartItem) {
+        await handleUpdate(existingCartItem, parseInt(data.quantity), index);
+        return;
+      }
+
+
+      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/create`, data, { headers });
+      if (response.data.message === 'Cart created successfully') {
         await Promise.all([
           new Promise(resolve => setTimeout(resolve, 1000)),
           new Promise<void>(resolve => setTimeout(() => {
-            setStocks(prev => {
-              const copy = [...prev];
-              const stock = copy[index];
-              if (action === 'subtract') {
-                stock.amount -= parseInt(selectedOptions[index]);
-              }
-              return copy;
-            });
             setIsLoadingButtons1(prev => {
               const copy = [...prev];
               copy[index] = false;
@@ -230,12 +258,72 @@ export default function DashBoard() {
               return copy;
             });
 
+            // ...
+
+            setCart(prevCart => {
+              const existingItemIndex = prevCart.findIndex(item => item.stockId === stock.id);
+
+              let newCart;
+              if (existingItemIndex !== -1) {
+
+                // Update the existing item's quantity
+                newCart = prevCart.map((item, index) => {
+                  if (index === existingItemIndex) {
+                    return {
+                      ...item,
+                      quantity: parseInt(item.quantity) + parseInt(selectedOptions[index]),
+                    };
+                  }
+                  return item;
+                });
+              } else {
+
+                // Add the new item to the Cart
+                newCart = [
+                  ...prevCart,
+                  {
+                    id: stock.id, // Save the cart item ID received from the server
+                    stockId: stock.id,
+                    name: stock.name,
+                    quantity: data.quantity,
+                  },
+                ];
+              }
+
+              // Save the updated Cart to local storage
+              localStorage.setItem('Cart', JSON.stringify(newCart));
+
+              return newCart;
+            });
+
+            // Update the stock quantity
+            stock.amount -= data.quantity;
+
+            // Update the stock quantity
+            setStocks(prevStocks => {
+              const updatedStocks = prevStocks.map(stock => {
+                if (stock.id === stock.id) {
+                  return {
+                    ...stock,
+                    quantity: stock.quantity - parseInt(selectedOptions[index]),
+                  };
+                }
+                return stock;
+              });
+
+              return updatedStocks;
+            });
+
+            // ...
+
+
+
             resolve();
           }, 1000))
         ]);
 
 
-        setMarkAsDelivered(true);
+        //setMarkAsDelivered(true);
       }
     } catch (error) {
       console.log(JSON.stringify(error));
@@ -249,9 +337,9 @@ export default function DashBoard() {
     }
   };
 
-  const handleStockUpdate2 = async (index, action) => {
+  const handleDeleteCartItem = async (index) => {
     if (isLoadingButtons2[index]) {
-      // Stock is already being updated, do nothing
+      // Cart item is already being deleted, do nothing
       return;
     }
 
@@ -262,35 +350,56 @@ export default function DashBoard() {
     });
 
     try {
-      const stock = stocks[index];
       const headers = {
         "x-access-token": token,
         "Accept": 'application/json',
       };
-      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${stock.id}`, { action }, { headers });
-      if (response.data.message === 'Stock updated successfully') {
+
+      const cartItem = cart[index];
+
+      if (!cartItem) {
+        alert("Cart item not found");
+        return;
+      }
+
+      const data = {
+        cartItemId: cartItem.id,
+      };
+
+      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/delete`, data, { headers });
+
+      if (response.data.message === 'Cart item deleted successfully') {
         await Promise.all([
           new Promise(resolve => setTimeout(resolve, 1000)),
           new Promise<void>(resolve => setTimeout(() => {
-            setStocks(prev => {
-              const copy = [...prev];
-              const stock = copy[index];
-              if (action === 'add') {
-                stock.amount += 1;
-              }
-              return copy;
-            });
             setIsLoadingButtons2(prev => {
               const copy = [...prev];
               copy[index] = false;
               return copy;
             });
+
+
+            const stock = stocks.find((item) => item.id === cartItem.stockId);
+
+            // Update the stock amount
+            stock.amount = response.data.amount;
+
+            // Update the Cart state
+            setCart(prevCart => {
+              const updatedCart = prevCart.filter(item => item.stockId !== cartItem.stockId);
+
+              // Save the updated Cart to local storage
+              localStorage.setItem('Cart', JSON.stringify(updatedCart));
+
+              return updatedCart;
+            });
+
             resolve();
           }, 1000))
         ]);
       }
     } catch (error) {
-      console.error(JSON.stringify(error));
+      alert(JSON.stringify(error));
       setTimeout(() => {
         setIsLoadingButtons2(prev => {
           const copy = [...prev];
@@ -300,6 +409,97 @@ export default function DashBoard() {
       }, 1000);
     }
   };
+
+  const handleUpdate = async (cartItem, quantity, index) => {
+    if (isLoadingButtons1[index]) {
+      // Stock is already being updated or a long press is in progress, do nothing
+      return;
+    }
+
+    setIsLoadingButtons1(prev => {
+      const copy = [...prev];
+      copy[index] = true;
+      return copy;
+    });
+
+    try {
+      const stock = stocks.find(item => item.id === cartItem.stockId);
+      const headers = {
+        "x-access-token": token,
+        "Accept": 'application/json',
+      };
+      const data = {
+        quantity: quantity,
+        cartItemId: stock.id,
+      };
+
+      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/update`, data, { headers });
+      if (response.data.message === 'Cart item updated successfully') {
+        await Promise.all([
+          new Promise(resolve => setTimeout(resolve, 1000)),
+          new Promise<void>(resolve => setTimeout(() => {
+            setIsLoadingButtons1(prev => {
+              const copy = [...prev];
+              copy[index] = false;
+              return copy;
+            });
+
+            setSelectedOptions(prev => {
+              const copy = [...prev];
+              copy[index] = '1';
+              return copy;
+            });
+
+            // Update the stock quantity
+            stock.amount -= data.quantity;
+
+            // Update the Cart state
+            setCart(prevCart => {
+              const newCart = prevCart.map(item => {
+                if (item.stockId === stock.id) {
+                  return {
+                    ...item,
+                    quantity: parseInt(item.quantity) + parseInt(quantity),
+                  };
+                }
+                return item;
+              });
+
+              // Save the updated Cart to local storage
+              localStorage.setItem('Cart', JSON.stringify(newCart));
+
+              return newCart;
+            });
+
+            // ...
+
+            resolve();
+          }, 1000))
+        ]);
+
+
+
+        setIsLoadingButtons1(prev => {
+          const copy = [...prev];
+          copy[index] = false;
+          return copy;
+        });
+
+        //setMarkAsDelivered(true);
+      }
+    } catch (error) {
+      alert(JSON.stringify(error));
+      setTimeout(() => {
+        setIsLoadingButtons1(prev => {
+          const copy = [...prev];
+          copy[index] = false;
+          return copy;
+        });
+      }, 1000);
+    }
+  };
+
+
 
   const handleOptionChange = (index, value) => {
     setSelectedOptions(prev => {
@@ -348,87 +548,89 @@ export default function DashBoard() {
             justifyContent="center"
             px={{ base: '25px', md: '0px' }}
             flexDirection="column"
-            align="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center"
-            alignSelf="center"
+            align="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center" justifySelf="center"
           >
-            <Card p="30px" >
-              <SimpleGrid row={2} gap="10px" mb="10px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
-                <Flex
-                  bg={ethBg}
-                  display='flex'
-                  borderRadius="30px"
-                  ms="auto"
-                  p="6px"
-                  align="center"
-                  me="6px"
-                >
+            <Card p="30px"  >
+              <Flex direction="column" w="100%" justifyContent="center" alignItems="center">
+                <Stack direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
                   <Flex
-                    align="center"
-                    justify="center"
-                    bg={ethBox}
-                    h="29px"
-                    w="29px"
+                    bg={ethBg}
+                    display='flex'
                     borderRadius="30px"
-                    me="7px"
-                  >
-                    <Icon color={ethColor} w="9px" h="14px" as={FaEthereum} />
-                  </Flex>
-                  <Text
-                    w="max-content"
-                    color={ethColor}
-                    fontSize="sm"
-                    fontWeight="700"
+                    ms="auto"
+                    p="6px"
+                    align="center"
                     me="6px"
                   >
-                    {`Ganhos ${bill.earn}`}
-                    <Text as="span" display={{ base: 'none', md: 'unset' }}>
-                      {' '}
-                      €
+                    <Flex
+                      align="center"
+                      justify="center"
+                      bg={ethBox}
+                      h="29px"
+                      w="29px"
+                      borderRadius="30px"
+                      me="7px"
+                    >
+                      <Icon color={ethColor} w="9px" h="14px" as={FaEthereum} />
+                    </Flex>
+                    <Text
+                      w="max-content"
+                      color={ethColor}
+                      fontSize="sm"
+                      fontWeight="700"
+                      me="6px"
+                    >
+                      {`Ganhos ${bill.earn}`}
+                      <Text as="span" display={{ base: 'none', md: 'unset' }}>
+                        {' '}
+                        €
+                      </Text>
                     </Text>
-                  </Text>
-                </Flex>
-                <Flex
-                  bg={ethBg}
-                  display='flex'
-                  borderRadius="30px"
-                  ms="auto"
-                  p="6px"
-                  align="center"
-                  me="6px"
-                >
-                  <Flex
-                    align="center"
-                    justify="center"
-                    bg={ethBox}
-                    h="29px"
-                    w="29px"
-                    borderRadius="30px"
-                    me="7px"
-                  >
-                    <Icon color={ethColor} w="9px" h="14px" as={FaEthereum} />
                   </Flex>
-                  <Text
-                    w="max-content"
-                    color={ethColor}
-                    fontSize="sm"
-                    fontWeight="700"
+                  <Flex
+                    bg={ethBg}
+                    display='flex'
+                    borderRadius="30px"
+                    ms="auto"
+                    p="6px"
+                    align="center"
                     me="6px"
                   >
-                    {`A Pagar ${bill.toPayTotal}`}
-                    <Text as="span" display={{ base: 'none', md: 'unset' }}>
-                      {' '}
-                      €
+                    <Flex
+                      align="center"
+                      justify="center"
+                      bg={ethBox}
+                      h="29px"
+                      w="29px"
+                      borderRadius="30px"
+                      me="7px"
+                    >
+                      <Icon color={ethColor} w="9px" h="14px" as={FaEthereum} />
+                    </Flex>
+                    <Text
+                      w="max-content"
+                      color={ethColor}
+                      fontSize="sm"
+                      fontWeight="700"
+                      me="6px"
+                    >
+                      {`A Pagar ${bill.toPayTotal}`}
+                      <Text as="span" display={{ base: 'none', md: 'unset' }}>
+                        {' '}
+                        €
+                      </Text>
                     </Text>
-                  </Text>
-                </Flex>
-              </SimpleGrid>
-
+                  </Flex>
+                </Stack>
+              </Flex>
               <Text mt="10px" color="secondaryGray.600" fontWeight="500" fontSize="sm" mb="10px">
                 Estoque restante
               </Text>
               {Array.isArray(stocks) &&
                 stocks.map((stock, index) => (
-                  <Flex key={stock.id} justifyContent='center' gap="20px" mb="10px" alignItems='center' textAlign='center' justifyItems='center' w='100%'>
+
+                  <SimpleGrid columns={3} gap="10px" mt="30px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+
                     <Flex direction='column' align='center' me='auto'>
                       <Text color={textColor} fontSize='md' me='6px' fontWeight='700'>
                         {stock.name}
@@ -441,17 +643,24 @@ export default function DashBoard() {
                       </Text>
                     </Flex>
 
-                    <Flex direction='column' align='center' alignContent='center' justifyContent='center' alignItems='center' textAlign='center' justifyItems='center' w='100%'>
+                    <Flex
+                      direction="column"
+                      align="center"
+                      alignContent="center"
+                      justifyContent="center"
+                      alignItems="center"
+                      textAlign="center"
+                      justifyItems="center"
+                      w="100%"
+                    >
 
                       <Select
-                        isDisabled={stock.amount == 0}
-                        ml="20px"
+                        isDisabled={stock.amount <= 0}
                         fontSize="sm"
                         id="quantity"
                         variant="main"
                         h="44px"
                         maxH="44px"
-                        minW="44px"
                         fontWeight="400"
                         onChange={(e) => handleOptionChange(index, e.target.value)}
                         value={selectedOptions[index]}
@@ -462,12 +671,13 @@ export default function DashBoard() {
                           </option>
                         ))}
                       </Select>
+
                     </Flex>
 
 
                     <Flex ml="20px" direction='column' align='center'>
                       <IconButton
-                        isDisabled={stock.amount == 0}
+                        isDisabled={stock.amount <= 0}
                         isLoading={isLoadingButtons1[index]}
                         aria-label='transfer'
                         borderRadius='50%'
@@ -479,18 +689,20 @@ export default function DashBoard() {
                         h='56px'
                         mb='5px'
                         boxShadow={shadow}
-                        onClick={(e) => handleStockUpdate1(index, 'subtract')}
-                        icon={<Icon as={MdAddShoppingCart} color={stock.amount == 0 ? redIcon : greenIcon} w='24px' h='24px' />}
-                      />
+                        onClick={(e) => handleCartCreate(index)}
+                        icon={<Icon as={MdAddShoppingCart} color={stock.amount <= 0 ? redIcon : greenIcon} w='24px' h='24px' />} />
                       <Text fontSize='sm' fontWeight='500' color={textColor}>
-                        {stock.amount == 0 ? 'Zerado' : 'Entregar'}
+                        {stock.amount == 0 ? 'Zerado' : 'Adicionar'}
                       </Text>
                     </Flex>
-                  </Flex>
+
+                  </SimpleGrid>
+
+
                 ))}
 
               <SimpleGrid columns={3} gap="10px" mt="30px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
-                <Flex direction='column' align='center' me={{ base: '16px', md: '0px', '2xl': '36px' }}  >
+                <Flex direction='column' align='center'>
                   <IconButton
                     //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
                     isDisabled={isLoadingReset || isLoadingMarkAsDelivered}
@@ -510,7 +722,7 @@ export default function DashBoard() {
                     Alterar
                   </Text>
                 </Flex>
-                <Flex direction='column' align='center' me={{ base: '16px', md: '0px', '2xl': '36px' }}  >
+                <Flex direction='column' align='center'>
                   <IconButton
                     //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
                     isDisabled={isLoadingReset || isLoadingMarkAsDelivered}
@@ -525,40 +737,138 @@ export default function DashBoard() {
                     h='56px'
                     mb='5px'
                     boxShadow={shadow}
-                    icon={<Icon as={MdClose} color={yellowIcon} w='24px' h='24px' />}
+                    icon={<Icon as={MdClose} color={redIcon} w='24px' h='24px' />}
                   />
                   <Text fontSize='sm' fontWeight='500' color={textColor}>
                     Fechar
                   </Text>
                 </Flex>
-                {showMarkAsDelivered && (
-                  <Flex direction='column' align='center' me={{ base: '16px', md: '0px', '2xl': '36px' }} >
-                    <IconButton
-                      isLoading={isLoadingMarkAsDelivered}
-                      isDisabled={isLoadingMarkAsDelivered}
-                      onClick={() => handleMarkAsDelivered()}
-                      aria-label='top'
-                      borderRadius='50%'
-                      bg={bgIconButton}
-                      _hover={bgIconHover}
-                      _active={bgIconFocus}
-                      _focus={bgIconFocus}
-                      w='56px'
-                      h='56px'
-                      mb='5px'
-                      boxShadow={shadow}
-                      icon={<Icon as={MdOutlineCheckCircleOutline} color={greenIcon} w='24px' h='24px' />}
-                    />
-                    <Text fontSize='sm' fontWeight='500' color={textColor}>
-                      Entreguei
-                    </Text>
-                  </Flex>
-                )}
+                <Flex direction='column' align='center'>
+                  <IconButton
+                    //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
+                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered || cart.length === 0}
+                    onClick={onOpen}
+                    aria-label='top'
+                    borderRadius='50%'
+                    bg={bgIconButton}
+                    _hover={bgIconHover}
+                    _active={bgIconFocus}
+                    _focus={bgIconFocus}
+                    w='56px'
+                    h='56px'
+                    mb='5px'
+                    boxShadow={shadow}
+                    icon={<Icon as={MdAddShoppingCart} color={yellowIcon} w='24px' h='24px' />}
+                  />
+                  <Text fontSize='sm' fontWeight='500' color={textColor}>
+                    Carrinho
+                  </Text>
+                </Flex>
               </SimpleGrid>
             </Card>
+
+            <>
+              <Modal closeOnOverlayClick={false} isOpen={isOpen} onClose={onClose}
+                isCentered
+                motionPreset="slideInBottom">
+                <ModalOverlay />
+                <ModalContent>
+                  <ModalHeader>Carrinho</ModalHeader>
+                  <ModalCloseButton />
+                  <Flex hidden={cart.length > 0} direction="column" w="100%">
+                    <Stack direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
+                      <Text align="center" fontWeight="bold">
+                        Carrinho vazio
+                      </Text>
+                    </Stack>
+                  </Flex>
+                  <ModalBody pb={6}>
+                    {Array.isArray(cart) &&
+                      cart.map((cart, index) => (
+
+                        <Flex justifyContent="center" alignItems="center" w="100%" >
+                          <Flex direction="column" align="center" me="auto">
+                            <Text color={textColor} fontSize="md" me="6px" fontWeight="700">
+                              {cart.name}
+                            </Text>
+                          </Flex>
+                          <SimpleGrid row={1} mr="40px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                            <Select
+                              isDisabled={cart.amount <= 0}
+                              fontSize="sm"
+                              id="quantity"
+                              variant="main"
+                              h="44px"
+                              maxH="44px"
+                              maxW="100px"
+                              fontWeight="400"
+                              onChange={(e) => handleOptionChange(index, e.target.value)}
+                              value={cart.quantity}
+                            >
+                              {options.map((option) => (
+                                <option key={option} value={option}>
+                                  {option}
+                                </option>
+                              ))}
+                            </Select>
+                          </SimpleGrid>
+                          <Flex mt="10px" direction='column' align='center'>
+                            <IconButton
+                              aria-label='transfer'
+                              borderRadius='50%'
+                              bg={bgIconButton}
+                              _hover={bgIconHover}
+                              _active={bgIconFocus}
+                              _focus={bgIconFocus}
+                              w='56px'
+                              h='56px'
+                              mb='5px'
+                              boxShadow={shadow}
+                              //onClick={(e) => handleStockUpdate2(index, 'update')}
+                              icon={<Icon as={MdEditSquare} color={yellowIcon} w='24px' h='24px' />} />
+                            <Text fontSize='sm' fontWeight='500' color={textColor}>
+                              Alterar
+                            </Text>
+                          </Flex>
+
+                          <Flex mt="10px" ml="20px" direction='column' align='center'>
+                            <IconButton
+                              isLoading={isLoadingButtons2[index]}
+                              aria-label='transfer'
+                              borderRadius='50%'
+                              bg={bgIconButton}
+                              _hover={bgIconHover}
+                              _active={bgIconFocus}
+                              _focus={bgIconFocus}
+                              w='56px'
+                              h='56px'
+                              mb='5px'
+                              boxShadow={shadow}
+                              onClick={(e) => handleDeleteCartItem(index)}
+                              icon={<Icon as={MdClose} color={redIcon} w='24px' h='24px' />} />
+                            <Text fontSize='sm' fontWeight='500' color={textColor}>
+                              Deletar
+                            </Text>
+                          </Flex>
+
+                        </Flex>
+                      ))}
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button 
+                    onClick={(e) => handleCloseCart()}
+                    isDisabled={cart.length === 0} colorScheme="brand" mr={3}>
+                      Entregar
+                    </Button>
+                    <Button onClick={onClose}>Fechar</Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+            </>
           </Flex>
-        </CenteredAuth>
-      )}
+        </CenteredAuth >
+      )
+      }
     </>
   );
 }

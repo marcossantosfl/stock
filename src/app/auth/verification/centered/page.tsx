@@ -102,7 +102,7 @@ function ForgotPassword() {
     }
 
     if (!otpDigit1 || !otpDigit2 || !otpDigit3 || !otpDigit4) {
-      setError("Please enter a 4 digit OTP code");
+      setError("Digite o código  recebido via mensagem no seu celular.");
       return;
     }
 
@@ -132,7 +132,7 @@ function ForgotPassword() {
         router.push("/user/new-user");
       }, 1500);
     } catch (error) {
-      setErrorInvalid("Invalid code, please try again");
+      setErrorInvalid("Codigo inválido, tente novamente.");
       console.error(error);
       setIsLoading(false);
     }
@@ -163,13 +163,13 @@ function ForgotPassword() {
       }
       const data = await response.json();
       setTimeout(() => {
-        setSuccess("A new code has been sent to your phone");
+        setSuccess("Um novo codigo foi enviado para o seu celular");
         setIsLoadingResend(false);
       }, 2000);
       
     } catch (error) {
       setTimeout(() => {
-        setErrorResend("Failed to resend code, please try again");
+        setErrorResend("Falha em reenviar o codigo, tente novamente");
         setIsLoadingResend(false);
       }, 2000);
       console.error(error);
@@ -202,7 +202,7 @@ function ForgotPassword() {
               color="white"
               fontWeight="400"
               fontSize="lg" textAlign='center'>
-              Loading...
+              Carregando...
             </Text>
           </Flex>
         </CenteredAuth>
@@ -232,7 +232,7 @@ function ForgotPassword() {
                     mx={{ base: 'auto', lg: 'unset' }}
                     textAlign={{ base: 'center', lg: 'left' }}
                   >
-                    Success!
+                    Sucesso!
                   </Heading>
                   <Text
                     color={textColorSecondary}
@@ -280,7 +280,7 @@ function ForgotPassword() {
                     mx={{ base: 'auto', lg: 'unset' }}
                     textAlign={{ base: 'center', lg: 'left' }}
                   >
-                    OTP Verification
+                    OTP verificação
                   </Heading>
                   <Text
                     color={textColorSecondary}
@@ -289,7 +289,7 @@ function ForgotPassword() {
                     mx={{ base: 'auto', lg: 'unset' }}
                     textAlign={{ base: 'center', lg: 'left' }}
                   >
-                    Enter your OTP Verification code to verify!
+                    Entre o codigo de verificação para confirmar sua conta!
                   </Text>
                 </Box>
                 <Flex
@@ -373,7 +373,7 @@ function ForgotPassword() {
                       isLoading={isLoadingResend}
                       onClick={handleUnlock}
                     >
-                      Verify
+                      Confirmar
 
                     </Button>
                     {errorInvalid && (
@@ -398,7 +398,7 @@ function ForgotPassword() {
                       textAlign={{ base: 'center', lg: 'left' }}
 
                     >
-                      Haven't received it?
+                      Não recebeu?
 
                       <Text onClick={handleResendCode} color={textColorBrand} style={{ cursor: 'pointer' }} as="span" ms="5px" fontWeight="500">
                         {isLoadingResend ? "Loading..." : "Resend a new code"}

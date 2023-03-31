@@ -81,7 +81,7 @@ function Home() {
               mb="26px"
               maxW="400px"
             >
-              Manage all of your goods from anywhere at any time.
+              Controle seu stock a hora que quiser.
             </Text>
             <Link href="/auth/sign-in/centered">
             <Button
@@ -94,7 +94,7 @@ function Home() {
               px="45px"
              
             >
-              Login
+              Acessar Minha Conta
             </Button>
           </Link>
           </Flex>
