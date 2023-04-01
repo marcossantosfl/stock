@@ -553,22 +553,22 @@ export default function DashBoard() {
 
                 <Stack direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
 
-                  <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="green">
+                  <Badge mt="4px" ml="1" fontSize="md"  colorScheme="green">
                     {`Ganhos  €${bill.earn}`}
                   </Badge>
 
-                  <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="blue">
+                  <Badge mt="4px" ml="1" fontSize="md"  colorScheme="blue">
                     {`A Pagar  €${bill.toPay}`}
                   </Badge>
 
-                  <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="yellow">
+                  <Badge mt="4px" ml="1" fontSize="md"  colorScheme="yellow">
                     {`Sistema  €${bill.toPayTotal.toFixed(2)}`}
                   </Badge>
                 </Stack>
 
                 <Text mt="30px" fontSize="xl" fontWeight="bold">
                   Total no carrinho:
-                  <Badge ml="1" fontSize="0.8em" colorScheme="green">
+                  <Badge ml="1" fontSize="md" colorScheme="green">
                     €{calculateTotalPrice(cart)}
                   </Badge>
                 </Text>
@@ -583,10 +583,10 @@ export default function DashBoard() {
                       <Text color={textColor} fontSize='md' me='6px' fontWeight='700'>
                         {stock.name}
                       </Text>
-                      <Badge ml="1" fontSize="0.8em" colorScheme="green">
+                      <Badge ml="1" fontSize="sm" colorScheme="green">
                         Qt: {stock.amount}
                       </Badge>
-                      <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="purple">
+                      <Badge mt="4px" ml="1" fontSize="sm" colorScheme="purple">
                         Valor: €{stock.value}
                       </Badge>
                     </Flex>

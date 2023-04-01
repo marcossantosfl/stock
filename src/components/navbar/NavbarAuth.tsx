@@ -21,6 +21,7 @@ import { SidebarContext } from 'contexts/SidebarContext';
 // Assets
 import routes from 'routes';
 import { IRoute } from 'types/navigation';
+import { useEffect } from 'react';
 
 export default function AuthNavbar(props: {
   logo?: JSX.Element | string;
@@ -31,6 +32,13 @@ export default function AuthNavbar(props: {
   const { logoText, sidebarWidth } = props;
 
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
+
+  useEffect(() => {
+    if (!userId) {
+      localStorage.clear();
+      window.location.href = "/home";
+    }
+  }, [userId]);
 
   const handleLogout = () => {
     localStorage.clear();
