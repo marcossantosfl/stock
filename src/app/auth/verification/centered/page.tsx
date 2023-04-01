@@ -64,12 +64,16 @@ function ForgotPassword() {
   const [otpDigit3, setOtpDigit3] = React.useState("");
   const [otpDigit4, setOtpDigit4] = React.useState("");
   const [success, setSuccess] = React.useState("");
-  const [isSigned, setIsSigned] = React.useState(false);
+  const [isSigned, setIsSigned] = React.useState(true);
   const [showSuccess, setShowSuccess] = React.useState(false);
 
   useEffect(() => {
+    if (userId) {
 
-    //localStorage.clear();
+      setTimeout(() => {
+        setIsSigned(false);
+      }, 1500);
+    }
 
     if (!userId) {
       //setTimeout(() => {
@@ -179,33 +183,26 @@ function ForgotPassword() {
   return (
     <>
       {isSigned ? (
-          <CenteredAuth
-          image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
-          cardTop={{ base: '140px', md: '14vh' }}
-          cardBottom={{ base: '50px', lg: '100px' }}
-          showCard={true}
-          cardSx={{ bg: 'none' }}
+        <CenteredAuth
+        image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+        cardTop={{ base: '140px', md: '14vh' }}
+        cardBottom={{ base: '50px', lg: '100px' }}
+        showCard={true}
+        cardSx={{ bg: 'none' }}
+      >
+        <Flex
+          w="100%"
+          maxW="max-content"
+          mx={{ base: 'auto', lg: '0px' }}
+          me="auto"
+          h="100%"
+          justifyContent="center"
+          px={{ base: '25px', md: '0px' }}
+          flexDirection="column"
         >
-          <Flex
-            w="100%"
-            maxW="max-content"
-            mx={{ base: 'auto', lg: '0px' }}
-            me="auto"
-            h="100%"
-            justifyContent="center"
-            px={{ base: '25px', md: '0px' }}
-            flexDirection="column"
-          >
-            <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
-            <Text mb="36px"
-              ms="4px"
-              color="white"
-              fontWeight="400"
-              fontSize="lg" textAlign='center'>
-              Carregando...
-            </Text>
-          </Flex>
-        </CenteredAuth>
+          <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
+        </Flex>
+      </CenteredAuth>
       ) : (
         <>
           {showSuccess ? (

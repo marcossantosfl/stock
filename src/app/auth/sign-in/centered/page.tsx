@@ -57,21 +57,16 @@ const SignIn = () => {
 
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
 
-  const [isRegister, setIsRegister] = React.useState(false);
+  const [isRegister, setIsRegister] = React.useState(true);
 
   useEffect(() => {
-    if (userId) {
-      setIsRegister(true);
+    if (!userId) {
+      setIsRegister(false);
+    }
+    else {
+      router.push("/auth/verification/centered");
     }
   }, [userId]);
-
-  useEffect(() => {
-    if (isRegister) {
-      setTimeout(() => {
-        router.push("/auth/verification/centered");
-      }, 2000);
-    }
-  }, [isRegister]);
 
   // Chakra color mode
   const textColor = useColorModeValue('navy.700', 'white');
@@ -167,21 +162,16 @@ const SignIn = () => {
           cardSx={{ bg: 'none' }}
         >
           <Flex
-            direction="column"
-
-            align="center"
+            w="100%"
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            h="100%"
             justifyContent="center"
-            pt={{ sm: '125px', lg: '75px' }}
-            position="relative"
+            px={{ base: '25px', md: '0px' }}
+            flexDirection="column"
           >
             <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
-            <Text mb="36px"
-              ms="4px"
-              color="white"
-              fontWeight="400"
-              fontSize="lg" textAlign='center'>
-              Carregando...
-            </Text>
           </Flex>
         </CenteredAuth>
       ) : (

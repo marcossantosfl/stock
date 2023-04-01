@@ -57,11 +57,14 @@ const SignUp = () => {
 
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
 
-  const [isRegister, setIsRegister] = React.useState(false);
+  const [isRegister, setIsRegister] = React.useState(true);
 
   useEffect(() => {
     if (userId) {
       setIsRegister(true);
+    }
+    else{
+      setIsRegister(false);
     }
   }, [userId]);
 
@@ -182,21 +185,16 @@ const SignUp = () => {
           cardSx={{ bg: 'none' }}
         >
           <Flex
-            direction="column"
-
-            align="center"
+            w="100%"
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            h="100%"
             justifyContent="center"
-            pt={{ sm: '125px', lg: '75px' }}
-            position="relative"
+            px={{ base: '25px', md: '0px' }}
+            flexDirection="column"
           >
             <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
-            <Text mb="36px"
-              ms="4px"
-              color="white"
-              fontWeight="400"
-              fontSize="lg" textAlign='center'>
-              Carregando...
-            </Text>
           </Flex>
         </CenteredAuth>
       ) : (
@@ -329,7 +327,7 @@ const SignUp = () => {
                 mt="0px"
               >
                 <Text color={textColorDetails} fontWeight="400" fontSize="sm">
-                Já possui uma conta?
+                  Já possui uma conta?
                   <Link href="/auth/sign-in/centered">
                     <Text
                       color={textColorBrand}

@@ -51,7 +51,6 @@ import { MdAddShoppingCart, MdClose, MdEditSquare } from 'react-icons/md';
 import Card from 'components/card/Card';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import { FaEthereum } from 'react-icons/fa';
 
 export default function DashBoard() {
   const router = useRouter();
@@ -60,8 +59,8 @@ export default function DashBoard() {
   const [isLoadingButtons1, setIsLoadingButtons1] = useState([]);
   const [isLoadingButtons2, setIsLoadingButtons2] = useState([]);
   const [isBlockButtons, setIsBlockButtons] = useState(false);
-  const [isLoadingMarkAsDelivered, setIsLoadingMarkAsDelivered] = useState(false);
   const [isCartProcess, setCartProcess] = useState(false);
+  const [isCartClosed, setisCartClosed] = useState(false);
   const [isLoadingReset, setIsLoadingReset] = useState(false);
   const [bill, setBill] = useState(null);
   const textColor = useColorModeValue('secondaryGray.900', 'white');
@@ -100,6 +99,13 @@ export default function DashBoard() {
     }
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      // Call your function here
+      setisCartClosed(false);
+    }
+  }, [isOpen]);
+
   // Load the cart data from the API when the component mounts
   useEffect(() => {
     fetchCart();
@@ -130,7 +136,7 @@ export default function DashBoard() {
         .catch(err => {
           console.error(err);
         });
-    }, 2000);
+    }, 100);
   }, [userId]);
 
   useEffect(() => {
@@ -155,8 +161,8 @@ export default function DashBoard() {
       };
 
       fetchBill();
-    }, 2000);
-  }, [isLoadingMarkAsDelivered]);
+    }, 100);
+  }, [isCartProcess]);
 
   const handleCloseCart = async () => {
 
@@ -164,7 +170,6 @@ export default function DashBoard() {
       return;
     }
 
-    setIsLoadingMarkAsDelivered(true);
     setCartProcess(true);
 
     try {
@@ -176,18 +181,18 @@ export default function DashBoard() {
       if (response.data.message === 'Cart closed successfully') {
         // Do something after the bill has been marked as delivered
         setTimeout(() => {
-          setIsLoadingMarkAsDelivered(false);
           setCart([])
           setCartProcess(false);
-        }, 300);
+          setisCartClosed(true);
+        }, 100);
 
       }
     } catch (error) {
       console.log(JSON.stringify(error));
       setTimeout(() => {
-        setIsLoadingMarkAsDelivered(false);
         setCartProcess(false);
-      }, 300);
+        setisCartClosed(false)
+      }, 100);
     }
   };
 
@@ -209,14 +214,14 @@ export default function DashBoard() {
         setTimeout(() => {
           router.push('/user/end-bill');
           //setIsLoadingReset(false);
-        }, 1000);
+        }, 300);
 
       }
     } catch (error) {
       console.error(JSON.stringify(error));
       setTimeout(() => {
         setIsLoadingReset(false);
-      }, 1000);
+      }, 300);
     }
   };
 
@@ -653,7 +658,7 @@ export default function DashBoard() {
                 <Flex direction='column' align='center'>
                   <IconButton
                     //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered || isBlockButtons}
+                    isDisabled={isLoadingReset || isBlockButtons}
                     aria-label='transfer'
                     borderRadius='50%'
                     bg={bgIconButton}
@@ -673,7 +678,7 @@ export default function DashBoard() {
                 <Flex direction='column' align='center'>
                   <IconButton
                     //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered || isBlockButtons}
+                    isDisabled={isLoadingReset || isBlockButtons}
                     onClick={() => handleEndDay()}
                     aria-label='top'
                     borderRadius='50%'
@@ -694,7 +699,7 @@ export default function DashBoard() {
                 <Flex direction='column' align='center'>
                   <IconButton
                     //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered || !cart || cart.length === 0 || isBlockButtons}
+                    isDisabled={isLoadingReset || !cart || cart.length === 0 || isBlockButtons}
                     onClick={onOpen}
                     aria-label='top'
                     borderRadius='50%'
@@ -723,13 +728,13 @@ export default function DashBoard() {
                 <ModalContent>
                   <ModalHeader>Carrinho</ModalHeader>
                   <ModalCloseButton />
-                  <Flex hidden={cart.length > 0} direction="column" w="100%">
-                    <Stack direction="column" mb="10px" spacing="10px" align="center" color={greenIcon} justifyContent="center" alignItems="center">
+                  <Flex direction="column" w="100%">
+                    <Stack hidden={!isCartClosed} direction="column" mb="10px" spacing="10px" align="center" color={greenIcon} justifyContent="center" alignItems="center">
                       <Text align="center" fontWeight="bold">
                         Pedido entregue com sucesso.
                       </Text>
                     </Stack>
-                    <Stack direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
+                    <Stack  hidden={cart.length > 0}  direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
                       <Text align="center" fontWeight="bold">
                         Carrinho vazio
                       </Text>
