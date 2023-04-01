@@ -89,7 +89,7 @@ export default function AuthNavbar(props: {
       </Link>
     );
   }
-  
+
   const linksAuth = (
     <HStack display={{ sm: 'none', lg: 'flex' }} spacing="20px">
       {routes.map((route) => (
@@ -103,7 +103,8 @@ export default function AuthNavbar(props: {
           cursor="pointer"
           position="relative"
         >
-          <Link href={route.path} style={{ maxWidth: 'max-content' }}>
+          <Link href={route.path === '/logout' ? '' : route.path}
+            onClick={route.path === '/logout' ? handleLogout : undefined} style={{ maxWidth: 'max-content' }}>
             <Text fontSize="sm" color={mainText}>
               {route.name}
             </Text>
@@ -111,7 +112,7 @@ export default function AuthNavbar(props: {
         </Stack>
       ))}
     </HStack>
-  );  
+  );
 
   return (
     <SidebarContext.Provider value={{ sidebarWidth }}>
