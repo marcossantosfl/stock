@@ -213,7 +213,7 @@ const SignUp = () => {
             px={{ base: '20px', md: '0px' }}
             flexDirection="column"
           >
-            <Box me="auto">
+            <Box textAlign="center" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center">
               <Heading
                 color={textColor}
                 fontSize={{ base: '34px', lg: '36px' }}
@@ -264,7 +264,7 @@ const SignUp = () => {
                     {error}
                   </FormLabel>
                 )}
-                <Flex justifyContent="space-between" align="center" mb="24px">
+                <Flex mt="20px" justifyContent="space-between" align="center" mb="24px">
                   <FormControl display="flex" alignItems="start">
                     <Checkbox
                       isDisabled={isLoading}
@@ -319,7 +319,7 @@ const SignUp = () => {
                   h="50"
                   mb="24px"
                   isLoading={isLoading}
-                  //isDisabled={isLoading}
+                  isDisabled={isLoading || !isValidPhoneNumber(phoneNumber)}
                   onClick={handleCreateAccount}
                 >
                   Criar conta

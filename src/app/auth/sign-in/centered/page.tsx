@@ -92,7 +92,7 @@ const SignIn = () => {
     if (isValidPhoneNumber(number)) {
       setError(null);
     } else {
-      setError("Invalid phone number");
+      setError("Celular inválido");
     }
 
     setphoneNumber(number);
@@ -106,7 +106,7 @@ const SignIn = () => {
     let error = false;
 
     if (!isValidPhoneNumber(phoneNumber)) {
-      setError("Invalid phone number");
+      setError("Celular inválido");
       error = true;
     } else {
       setError(null);
@@ -193,23 +193,15 @@ const SignIn = () => {
             px={{ base: '20px', md: '0px' }}
             flexDirection="column"
           >
-            <Box me="auto">
+            <Box justifyContent="center" alignItems="center" justifyItems="center" alignContent="center">
               <Heading
+              textAlign="center" 
                 color={textColor}
                 fontSize={{ base: '34px', lg: '36px' }}
                 mb="10px"
               >
                 Minha Conta
               </Heading>
-              <Text
-                mb="36px"
-                ms="4px"
-                color={textColorSecondary}
-                fontWeight="400"
-                fontSize="md"
-              >
-                Digite o numero do seu celular.
-              </Text>
             </Box>
             <Flex
               zIndex="2"
