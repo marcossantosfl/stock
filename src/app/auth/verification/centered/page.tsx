@@ -53,7 +53,7 @@ function ForgotPassword() {
   const borderColor = useColorModeValue('secondaryGray.400', 'whiteAlpha.100');
   const textColorDetails = useColorModeValue('navy.700', 'secondaryGray.600');
   const textColorBrand = useColorModeValue('brand.500', 'white');
-
+  const blueColor = useColorModeValue('blue.500', 'white');
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingResend, setIsLoadingResend] = React.useState(false);
   const [error, setError] = React.useState('');
@@ -110,11 +110,10 @@ function ForgotPassword() {
       return;
     }
 
-    setErrorInvalid("");
-    setError("");
-    setErrorResend("");
-
     try {
+      setErrorInvalid("");
+      setError("");
+      setErrorResend("");
       setIsLoading(true);
       const otp = `${otpDigit1}${otpDigit2}${otpDigit3}${otpDigit4}`;
       const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/verify", {
@@ -204,56 +203,7 @@ function ForgotPassword() {
         </Flex>
       </CenteredAuth>
       ) : (
-        <>
-          {showSuccess ? (
-            <CenteredAuth
-              image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
-              cardTop={{ base: '140px', md: '24vh' }}
-              cardBottom={{ base: '50px', lg: 'auto' }}
-            >
-              <Flex
-                w="100%"
-                maxW="max-content"
-                mx={{ base: 'auto', lg: '0px' }}
-                me="auto"
-                h="100%"
-                justifyContent="center"
-                px={{ base: '25px', md: '0px' }}
-                flexDirection="column"
-              >
-                <Box me="auto" mb="34px">
-                  <Heading
-                    color={textColor}
-                    fontSize="36px"
-                    mb="16px"
-                    mx={{ base: 'auto', lg: 'unset' }}
-                    textAlign={{ base: 'center', lg: 'left' }}
-                  >
-                    Sucesso!
-                  </Heading>
-                  <Text
-                    color={textColorSecondary}
-                    fontSize="md"
-                    maxW={{ base: '95%', md: '100%' }}
-                    mx={{ base: 'auto', lg: 'unset' }}
-                    textAlign={{ base: 'center', lg: 'left' }}
-                  >
-                    You have successfully verified your OTP. Thank you for registering!
-                  </Text>
-                  <Text
-                    color={textColorSecondary}
-                    fontSize="md"
-                    maxW={{ base: '95%', md: '100%' }}
-                    mx={{ base: 'auto', lg: 'unset' }}
-                    textAlign={{ base: 'center', lg: 'left' }}
-                    mt={4}
-                  >
-                    You will receive a text message with updates soon.
-                  </Text>
-                </Box>
-              </Flex>
-            </CenteredAuth>
-          ) : (
+
             <CenteredAuth
               image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
               cardTop={{ base: '140px', md: '24vh' }}
@@ -358,7 +308,8 @@ function ForgotPassword() {
                       </FormLabel>
                     )}
                     <Button
-                      //disabled={isLoadingResend}
+                       _loading={{bg:blueColor}}
+                      disabled={isLoading}
                       fontSize="14px"
                       variant="brand"
                       borderRadius="16px"
@@ -367,7 +318,7 @@ function ForgotPassword() {
                       h="50"
                       mb="24px"
                       mt="12px"
-                      isLoading={isLoadingResend}
+                      isLoading={isLoading}
                       onClick={handleUnlock}
                     >
                       Confirmar
@@ -406,10 +357,7 @@ function ForgotPassword() {
                   </Flex>
                 </Flex>
               </Flex>
-
             </CenteredAuth>
-          )}
-        </>
       )}
     </>
   );

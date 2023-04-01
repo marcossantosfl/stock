@@ -45,10 +45,8 @@ import Link from 'components/link/Link';
 import CenteredAuth from '../../../../components/auth/variants/CenteredAuthLayout/page';
 
 // Assets
-import PhoneNumberInput from 'components/phone/phone';
-import { COUNTRIES } from 'components/phone/countries';
-
-import { isValidNumber } from "libphonenumber-js";
+import  { PhoneInput  } from "react-contact-number-input";
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 const SignIn = () => {
 
@@ -58,6 +56,8 @@ const SignIn = () => {
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
 
   const [isRegister, setIsRegister] = React.useState(true);
+
+  const blueColor = useColorModeValue('blue.500', 'white');
 
   useEffect(() => {
     if (!userId) {
@@ -74,24 +74,28 @@ const SignIn = () => {
   const textColorDetails = useColorModeValue('navy.700', 'secondaryGray.600');
   const textColorBrand = useColorModeValue('brand.500', 'white');
   const brandStars = useColorModeValue('brand.500', 'brand.400');
-
-  const countryOptions = COUNTRIES.map(({ name, iso }) => ({
-    label: name,
-    value: iso
-  }));
   const [isLoading, setIsLoading] = React.useState(false);
   const [phoneNumber, setphoneNumber] = React.useState("");
   const [error, setError] = React.useState(null);
   const [errorUser, setErrorUser] = React.useState(null);
 
 
+  const isValidPhoneNumber = (phoneNumber) => {
+    const parsedPhoneNumber = parsePhoneNumberFromString(phoneNumber);
+    return parsedPhoneNumber ? parsedPhoneNumber.isValid() : false;
+  }
+
   const handlePhoneNumberChange = (phoneNumber) => {
-    if (isValidNumber(phoneNumber)) {
+
+    let number = phoneNumber?.validData?.phoneNumber || "";
+
+    if (isValidPhoneNumber(number)) {
       setError(null);
-      setphoneNumber(phoneNumber);
     } else {
       setError("Invalid phone number");
     }
+
+    setphoneNumber(number);
   };
 
   const handleLogin = async () => {
@@ -101,17 +105,18 @@ const SignIn = () => {
 
     let error = false;
 
-    if (!isValidNumber(phoneNumber)) {
+    if (!isValidPhoneNumber(phoneNumber)) {
       setError("Invalid phone number");
       error = true;
     } else {
       setError(null);
     }
 
-    setIsLoading(true);
-    setErrorUser("");
+   
 
     if (!error) {
+      setErrorUser("");
+      setIsLoading(true);
       try {
         const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/login", {
           method: "POST",
@@ -218,38 +223,46 @@ const SignIn = () => {
               mb={{ base: '20px', md: 'auto' }}
             >
               <FormControl>
-                <FormLabel
-                  ms="4px"
-                  fontSize="sm"
-                  fontWeight="500"
-                  color={textColor}
-                  display="flex"
-                >
-                  Celular<Text color={brandStars}>*</Text>
-                </FormLabel>
-                <InputGroup size="md">
-                  <PhoneNumberInput
-                    isDisabled={isLoading}
-                    isRequired={true}
-                    size="lg"
-                    type="tel" placeholder="083xxxxxxx" borderRadius="16px"
-                    value={phoneNumber}
-                    options={countryOptions}
-                    onChange={phoneNumber => handlePhoneNumberChange(phoneNumber)} country={undefined}
-                  />
 
-                </InputGroup>
+
+                <Flex
+                  flexDirection="column"
+                  justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center"
+                  align="center"
+                >
+                  <FormLabel
+                    ms="4px"
+                    fontSize="sm"
+                    fontWeight="500"
+                    color={textColor}
+                    display="flex"
+                  >
+                    Celular<Text color={brandStars}>*</Text>
+                  </FormLabel>
+                  <InputGroup size="md" textAlign="center" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" mt="10px"
+                  >
+                    <PhoneInput
+                   
+                      country={'IE'}
+                      onChange={(value: string) => {
+                        handlePhoneNumberChange(value);
+                      }}
+                    />
+                  </InputGroup>
+                </Flex>
                 {error && (
-                  <FormLabel textAlign="center" fontSize="sm" color="red.500">
+                  <FormLabel mt="10px" textAlign="center" fontSize="sm" color="red.500">
                     {error}
                   </FormLabel>
                 )}
                 {errorUser && (
-                  <FormLabel fontSize="sm" textAlign="center" color="red.500">
+                  <FormLabel mt="10px" fontSize="sm" textAlign="center" color="red.500">
                     {errorUser}
                   </FormLabel>
                 )}
                 <Button
+                 _loading={{bg:blueColor}}
+                  mt="30px"
                   variant="brand"
                   fontSize="14px"
                   fontWeight="500"
@@ -257,7 +270,7 @@ const SignIn = () => {
                   h="50"
                   mb="24px"
                   isLoading={isLoading}
-                  //isDisabled={isLoading}
+                  isDisabled={isLoading || !isValidPhoneNumber(phoneNumber)}
                   onClick={handleLogin}
                 >
                   Acessar

@@ -33,13 +33,6 @@ export default function AuthNavbar(props: {
 
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
 
-  useEffect(() => {
-    if (!userId) {
-      localStorage.clear();
-      window.location.href = "/home";
-    }
-  }, [userId]);
-
   const handleLogout = () => {
     localStorage.clear();
     window.location.href = "/home";

@@ -45,10 +45,8 @@ import Link from 'components/link/Link';
 import CenteredAuth from '../../../../components/auth/variants/CenteredAuthLayout/page';
 
 // Assets
-import PhoneNumberInput from 'components/phone/phone';
-import { COUNTRIES } from 'components/phone/countries';
-
-import { isValidNumber } from "libphonenumber-js";
+import { PhoneInput } from "react-contact-number-input";
+import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 const SignUp = () => {
 
@@ -57,13 +55,13 @@ const SignUp = () => {
 
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
 
-  const [isRegister, setIsRegister] = React.useState(true);
+  const [isRegister, setIsRegister] = React.useState(false);
 
   useEffect(() => {
     if (userId) {
       setIsRegister(true);
     }
-    else{
+    else {
       setIsRegister(false);
     }
   }, [userId]);
@@ -78,15 +76,10 @@ const SignUp = () => {
 
   // Chakra color mode
   const textColor = useColorModeValue('navy.700', 'white');
-  const textColorSecondary = 'gray.400';
   const textColorDetails = useColorModeValue('navy.700', 'secondaryGray.600');
   const textColorBrand = useColorModeValue('brand.500', 'white');
   const brandStars = useColorModeValue('brand.500', 'brand.400');
 
-  const countryOptions = COUNTRIES.map(({ name, iso }) => ({
-    label: name,
-    value: iso
-  }));
   const [isLoading, setIsLoading] = React.useState(false);
   const [isChecked, setIsChecked] = React.useState(false);
   const [phoneNumber, setphoneNumber] = React.useState("");
@@ -95,13 +88,22 @@ const SignUp = () => {
   const [errorAgree, setErrorAgree] = React.useState(null);
 
 
+  const isValidPhoneNumber = (phoneNumber) => {
+    const parsedPhoneNumber = parsePhoneNumberFromString(phoneNumber);
+    return parsedPhoneNumber ? parsedPhoneNumber.isValid() : false;
+  }
+
   const handlePhoneNumberChange = (phoneNumber) => {
-    if (isValidNumber(phoneNumber)) {
+
+    let number = phoneNumber?.validData?.phoneNumber || "";
+
+    if (isValidPhoneNumber(number)) {
       setError(null);
-      setphoneNumber(phoneNumber);
     } else {
       setError("Celular inválido");
     }
+
+    setphoneNumber(number);
   };
 
   const handleCheckboxChange = () => {
@@ -128,17 +130,17 @@ const SignUp = () => {
       setErrorAgree(null);
     }
 
-    if (!isValidNumber(phoneNumber)) {
-      setError("Celular inválido");
+    if (!isValidPhoneNumber(phoneNumber)) {
+
       error = true;
     } else {
       setError(null);
     }
 
-    setIsLoading(true);
-    setErrorUser("")
 
     if (!error) {
+      setErrorUser("")
+      setIsLoading(true);
       try {
         const response = await fetch("https://api-stock-23gsh.ondigitalocean.app/api/auth/register", {
           method: "POST",
@@ -232,29 +234,33 @@ const SignUp = () => {
               mb={{ base: '20px', md: 'auto' }}
             >
               <FormControl>
-                <FormLabel
-                  ms="4px"
-                  fontSize="sm"
-                  fontWeight="500"
-                  color={textColor}
-                  display="flex"
+              <Flex
+                  flexDirection="column"
+                  justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center"
+                  align="center"
                 >
-                  Numero do celular<Text color={brandStars}>*</Text>
-                </FormLabel>
-                <InputGroup size="md">
-                  <PhoneNumberInput
-                    isDisabled={isLoading}
-                    isRequired={true}
-                    size="lg"
-                    type="tel" placeholder="phone number" borderRadius="16px"
-                    value={phoneNumber}
-                    options={countryOptions}
-                    onChange={phoneNumber => handlePhoneNumberChange(phoneNumber)} country={undefined}
-                  />
-
-                </InputGroup>
+                  <FormLabel
+                    ms="4px"
+                    fontSize="sm"
+                    fontWeight="500"
+                    color={textColor}
+                    display="flex"
+                  >
+                    Celular<Text color={brandStars}>*</Text>
+                  </FormLabel>
+                  <InputGroup size="md" textAlign="center" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" mt="10px"
+                  >
+                    <PhoneInput
+                   
+                      country={'IE'}
+                      onChange={(value: string) => {
+                        handlePhoneNumberChange(value);
+                      }}
+                    />
+                  </InputGroup>
+                </Flex>
                 {error && (
-                  <FormLabel textAlign="center" fontSize="sm" color="red.500">
+                  <FormLabel mt="10px" textAlign="center" fontSize="sm" color="red.500">
                     {error}
                   </FormLabel>
                 )}
