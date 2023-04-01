@@ -34,6 +34,7 @@ export default function CenteredAuthLayout(props: CenteredAuthLayoutProps) {
       minH="100vh"
     >
       <FixedPlugin />
+    
       <Box
         position="absolute"
         minH={{ base: '50vh', md: '50vh' }}

@@ -47,7 +47,7 @@ import {
 // Custom components
 import React, { useEffect, useState } from 'react';
 import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
-import { MdAdd, MdAddCircle, MdAddCircleOutline, MdAddShoppingCart, MdAttachMoney, MdCached, MdClose, MdDomain, MdEditSquare, MdElectricCar, MdMoreHoriz, MdOutlineCheckCircleOutline, MdRemoveRedEye, MdSchool } from 'react-icons/md';
+import { MdAddShoppingCart, MdClose, MdEditSquare } from 'react-icons/md';
 import Card from 'components/card/Card';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -59,8 +59,9 @@ export default function DashBoard() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingButtons1, setIsLoadingButtons1] = useState([]);
   const [isLoadingButtons2, setIsLoadingButtons2] = useState([]);
-  const [showMarkAsDelivered, setMarkAsDelivered] = useState(false);
+  const [isBlockButtons, setIsBlockButtons] = useState(false);
   const [isLoadingMarkAsDelivered, setIsLoadingMarkAsDelivered] = useState(false);
+  const [isCartProcess, setCartProcess] = useState(false);
   const [isLoadingReset, setIsLoadingReset] = useState(false);
   const [bill, setBill] = useState(null);
   const textColor = useColorModeValue('secondaryGray.900', 'white');
@@ -68,9 +69,6 @@ export default function DashBoard() {
   const redIcon = useColorModeValue('red.500', 'white');
   const yellowIcon = useColorModeValue('yellow.500', 'white');
   const greenIcon = useColorModeValue('green.500', 'white');
-  const ethColor = useColorModeValue('gray.700', 'white');
-  const ethBg = useColorModeValue('secondaryGray.300', 'navy.900');
-  const ethBox = useColorModeValue('white', 'navy.800');
   const [selectedOptions, setSelectedOptions] = useState([]);
   const options = Array.from({ length: 100 }, (_, i) => `${i + 1}`);
   const bgIconButton = useColorModeValue('white', 'whiteAlpha.100');
@@ -82,20 +80,30 @@ export default function DashBoard() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [cart, setCart] = useState([]);
 
-  //localStorage.removeItem('Cart')
+  const fetchCart = async () => {
+    try {
+      const headers = {
+        "x-access-token": token,
+        "Accept": "application/json",
+      };
+      const response = await axios.get(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}`, { headers });
 
-  // Load the cart data from local storage when the component mounts
-  useEffect(() => {
-    const storedCart = typeof localStorage !== 'undefined' ? localStorage.getItem("Cart") : null;
-    if (storedCart) {
-      setCart(JSON.parse(storedCart));
+      if (response.data.error === 'Cart not found') {
+        setCart([])
+      } else {
+        //alert(JSON.stringify(response.data))
+        setCart(response.data.cartItems);
+      }
+    } catch (error) {
+      console.log(JSON.stringify(error))
+      console.log(error);
     }
-  }, []);
+  };
 
-  // Update the local storage whenever the Cart state changes
+  // Load the cart data from the API when the component mounts
   useEffect(() => {
-    typeof localStorage !== 'undefined' ? localStorage.setItem('Cart', JSON.stringify(cart)) : null;
-  }, [cart]);
+    fetchCart();
+  }, []);
 
   useEffect(() => {
     setSelectedOptions(Array.from({ length: stocks.length }, () => '1'));
@@ -152,11 +160,13 @@ export default function DashBoard() {
 
   const handleCloseCart = async () => {
 
-    if (isLoadingMarkAsDelivered) {
+    if (isCartProcess) {
       return;
     }
 
     setIsLoadingMarkAsDelivered(true);
+    setCartProcess(true);
+
     try {
       const headers = {
         "x-access-token": token,
@@ -164,18 +174,19 @@ export default function DashBoard() {
       };
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/close`, {}, { headers });
       if (response.data.message === 'Cart closed successfully') {
-        alert('okay')
         // Do something after the bill has been marked as delivered
         setTimeout(() => {
           setIsLoadingMarkAsDelivered(false);
-          setMarkAsDelivered(false);
+          setCart([])
+          setCartProcess(false);
         }, 1000);
 
       }
     } catch (error) {
-      alert(JSON.stringify(error));
+      console.log(JSON.stringify(error));
       setTimeout(() => {
         setIsLoadingMarkAsDelivered(false);
+        setCartProcess(false);
       }, 1000);
     }
   };
@@ -222,6 +233,8 @@ export default function DashBoard() {
       return copy;
     });
 
+    setIsBlockButtons(true);
+
     try {
       const stock = stocks[index];
       const headers = {
@@ -244,7 +257,7 @@ export default function DashBoard() {
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/create`, data, { headers });
       if (response.data.message === 'Cart created successfully') {
         await Promise.all([
-          new Promise(resolve => setTimeout(resolve, 1000)),
+          new Promise(resolve => setTimeout(resolve, 100)),
           new Promise<void>(resolve => setTimeout(() => {
             setIsLoadingButtons1(prev => {
               const copy = [...prev];
@@ -258,43 +271,17 @@ export default function DashBoard() {
               return copy;
             });
 
-            // ...
+            // ...       
 
-            setCart(prevCart => {
-              const existingItemIndex = prevCart.findIndex(item => item.stockId === stock.id);
+            const cartItems = {
+              cartId: response.data.cartId,
+              stockId: stock.id,
+              quantity: parseInt(data.quantity),
+              price: stock.value,
+              stockName: stock.name,
+            };
 
-              let newCart;
-              if (existingItemIndex !== -1) {
-
-                // Update the existing item's quantity
-                newCart = prevCart.map((item, index) => {
-                  if (index === existingItemIndex) {
-                    return {
-                      ...item,
-                      quantity: parseInt(item.quantity) + parseInt(selectedOptions[index]),
-                    };
-                  }
-                  return item;
-                });
-              } else {
-
-                // Add the new item to the Cart
-                newCart = [
-                  ...prevCart,
-                  {
-                    id: stock.id, // Save the cart item ID received from the server
-                    stockId: stock.id,
-                    name: stock.name,
-                    quantity: data.quantity,
-                  },
-                ];
-              }
-
-              // Save the updated Cart to local storage
-              localStorage.setItem('Cart', JSON.stringify(newCart));
-
-              return newCart;
-            });
+            setCart([...cart, cartItems]);
 
             // Update the stock quantity
             stock.amount -= data.quantity;
@@ -305,7 +292,7 @@ export default function DashBoard() {
                 if (stock.id === stock.id) {
                   return {
                     ...stock,
-                    quantity: stock.quantity - parseInt(selectedOptions[index]),
+                    quantity: parseInt(stock.quantity) - parseInt(selectedOptions[index]),
                   };
                 }
                 return stock;
@@ -316,10 +303,10 @@ export default function DashBoard() {
 
             // ...
 
-
+            setIsBlockButtons(false);
 
             resolve();
-          }, 1000))
+          }, 100))
         ]);
 
 
@@ -333,7 +320,8 @@ export default function DashBoard() {
           copy[index] = false;
           return copy;
         });
-      }, 1000);
+        setIsBlockButtons(false);
+      }, 100);
     }
   };
 
@@ -342,6 +330,8 @@ export default function DashBoard() {
       // Cart item is already being deleted, do nothing
       return;
     }
+
+    setIsBlockButtons(true);
 
     setIsLoadingButtons2(prev => {
       const copy = [...prev];
@@ -363,7 +353,7 @@ export default function DashBoard() {
       }
 
       const data = {
-        cartItemId: cartItem.id,
+        cartItemId: cartItem.stockId,
       };
 
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/delete`, data, { headers });
@@ -384,28 +374,29 @@ export default function DashBoard() {
             // Update the stock amount
             stock.amount = response.data.amount;
 
+
             // Update the Cart state
             setCart(prevCart => {
-              const updatedCart = prevCart.filter(item => item.stockId !== cartItem.stockId);
-
-              // Save the updated Cart to local storage
-              localStorage.setItem('Cart', JSON.stringify(updatedCart));
+              const updatedCart = prevCart.filter(item => item.stockId !== data.cartItemId);
 
               return updatedCart;
             });
+
+            setIsBlockButtons(false);
 
             resolve();
           }, 1000))
         ]);
       }
     } catch (error) {
-      alert(JSON.stringify(error));
+      console.log(JSON.stringify(error));
       setTimeout(() => {
         setIsLoadingButtons2(prev => {
           const copy = [...prev];
           copy[index] = false;
           return copy;
         });
+        setIsBlockButtons(false);
       }, 1000);
     }
   };
@@ -421,6 +412,9 @@ export default function DashBoard() {
       copy[index] = true;
       return copy;
     });
+
+
+    setIsBlockButtons(true);
 
     try {
       const stock = stocks.find(item => item.id === cartItem.stockId);
@@ -455,28 +449,25 @@ export default function DashBoard() {
 
             // Update the Cart state
             setCart(prevCart => {
-              const newCart = prevCart.map(item => {
+              const updatedCart = prevCart.map(item => {
                 if (item.stockId === stock.id) {
                   return {
                     ...item,
-                    quantity: parseInt(item.quantity) + parseInt(quantity),
+                    quantity: Number(item.quantity) + Number(data.quantity),
                   };
                 }
                 return item;
               });
-
-              // Save the updated Cart to local storage
-              localStorage.setItem('Cart', JSON.stringify(newCart));
-
-              return newCart;
+              return updatedCart;
             });
 
+
+            setIsBlockButtons(false);
             // ...
 
             resolve();
           }, 1000))
         ]);
-
 
 
         setIsLoadingButtons1(prev => {
@@ -488,7 +479,7 @@ export default function DashBoard() {
         //setMarkAsDelivered(true);
       }
     } catch (error) {
-      alert(JSON.stringify(error));
+      console.log(JSON.stringify(error));
       setTimeout(() => {
         setIsLoadingButtons1(prev => {
           const copy = [...prev];
@@ -499,6 +490,13 @@ export default function DashBoard() {
     }
   };
 
+  const calculateTotalPrice = (cart) => {
+    let totalPrice = 0;
+    cart.forEach((item) => {
+      totalPrice += item.price * parseInt(item.quantity);
+    });
+    return totalPrice;
+  };
 
 
   const handleOptionChange = (index, value) => {
@@ -552,96 +550,47 @@ export default function DashBoard() {
           >
             <Card p="30px"  >
               <Flex direction="column" w="100%" justifyContent="center" alignItems="center">
+
                 <Stack direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
-                  <Flex
-                    bg={ethBg}
-                    display='flex'
-                    borderRadius="30px"
-                    ms="auto"
-                    p="6px"
-                    align="center"
-                    me="6px"
-                  >
-                    <Flex
-                      align="center"
-                      justify="center"
-                      bg={ethBox}
-                      h="29px"
-                      w="29px"
-                      borderRadius="30px"
-                      me="7px"
-                    >
-                      <Icon color={ethColor} w="9px" h="14px" as={FaEthereum} />
-                    </Flex>
-                    <Text
-                      w="max-content"
-                      color={ethColor}
-                      fontSize="sm"
-                      fontWeight="700"
-                      me="6px"
-                    >
-                      {`Ganhos ${bill.earn}`}
-                      <Text as="span" display={{ base: 'none', md: 'unset' }}>
-                        {' '}
-                        €
-                      </Text>
-                    </Text>
-                  </Flex>
-                  <Flex
-                    bg={ethBg}
-                    display='flex'
-                    borderRadius="30px"
-                    ms="auto"
-                    p="6px"
-                    align="center"
-                    me="6px"
-                  >
-                    <Flex
-                      align="center"
-                      justify="center"
-                      bg={ethBox}
-                      h="29px"
-                      w="29px"
-                      borderRadius="30px"
-                      me="7px"
-                    >
-                      <Icon color={ethColor} w="9px" h="14px" as={FaEthereum} />
-                    </Flex>
-                    <Text
-                      w="max-content"
-                      color={ethColor}
-                      fontSize="sm"
-                      fontWeight="700"
-                      me="6px"
-                    >
-                      {`A Pagar ${bill.toPayTotal}`}
-                      <Text as="span" display={{ base: 'none', md: 'unset' }}>
-                        {' '}
-                        €
-                      </Text>
-                    </Text>
-                  </Flex>
+
+                  <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="green">
+                    {`Ganhos  €${bill.earn}`}
+                  </Badge>
+
+                  <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="blue">
+                    {`A Pagar  €${bill.toPay}`}
+                  </Badge>
+
+                  <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="yellow">
+                    {`Sistema  €${bill.toPayTotal.toFixed(2)}`}
+                  </Badge>
                 </Stack>
+
+                <Text mt="30px" fontSize="xl" fontWeight="bold">
+                  Total no carrinho:
+                  <Badge ml="1" fontSize="0.8em" colorScheme="green">
+                    €{calculateTotalPrice(cart)}
+                  </Badge>
+                </Text>
+
               </Flex>
-              <Text mt="10px" color="secondaryGray.600" fontWeight="500" fontSize="sm" mb="10px">
-                Estoque restante
-              </Text>
               {Array.isArray(stocks) &&
                 stocks.map((stock, index) => (
 
-                  <SimpleGrid key={index}  columns={3} gap="10px" mt="30px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                  <SimpleGrid key={index} columns={3} gap="10px" mt="30px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
 
-                    <Flex direction='column' align='center' me='auto'>
+                    <Flex direction='column' justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
                       <Text color={textColor} fontSize='md' me='6px' fontWeight='700'>
                         {stock.name}
                       </Text>
-                      <Text color='secondaryGray.600' fontSize='sm' fontWeight='500'>
+                      <Badge ml="1" fontSize="0.8em" colorScheme="green">
                         Qt: {stock.amount}
-                      </Text>
-                      <Text color='secondaryGray.600' fontSize='sm' fontWeight='500'>
+                      </Badge>
+                      <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="purple">
                         Valor: €{stock.value}
-                      </Text>
+                      </Badge>
                     </Flex>
+
 
                     <Flex
                       direction="column"
@@ -656,6 +605,7 @@ export default function DashBoard() {
 
                       <Select
                         isDisabled={stock.amount <= 0}
+                        ml="10px"
                         fontSize="sm"
                         id="quantity"
                         variant="main"
@@ -665,19 +615,18 @@ export default function DashBoard() {
                         onChange={(e) => handleOptionChange(index, e.target.value)}
                         value={selectedOptions[index]}
                       >
-                        {options.map((option) => (
-                          <option key={option} value={option}>
-                            {option}
+                        {Array.from({ length: stock.amount }, (_, i) => (
+                          <option key={i} value={i + 1}>
+                            {i + 1}
                           </option>
                         ))}
                       </Select>
-
                     </Flex>
 
 
                     <Flex ml="20px" direction='column' align='center'>
                       <IconButton
-                        isDisabled={stock.amount <= 0}
+                        isDisabled={stock.amount <= 0 || isLoadingButtons1[index] || isBlockButtons}
                         isLoading={isLoadingButtons1[index]}
                         aria-label='transfer'
                         borderRadius='50%'
@@ -695,7 +644,6 @@ export default function DashBoard() {
                         {stock.amount == 0 ? 'Zerado' : 'Adicionar'}
                       </Text>
                     </Flex>
-
                   </SimpleGrid>
 
 
@@ -705,7 +653,7 @@ export default function DashBoard() {
                 <Flex direction='column' align='center'>
                   <IconButton
                     //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered}
+                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered || isBlockButtons}
                     aria-label='transfer'
                     borderRadius='50%'
                     bg={bgIconButton}
@@ -725,7 +673,7 @@ export default function DashBoard() {
                 <Flex direction='column' align='center'>
                   <IconButton
                     //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered}
+                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered || isBlockButtons}
                     onClick={() => handleEndDay()}
                     aria-label='top'
                     borderRadius='50%'
@@ -746,7 +694,7 @@ export default function DashBoard() {
                 <Flex direction='column' align='center'>
                   <IconButton
                     //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered || cart.length === 0}
+                    isDisabled={isLoadingReset || isLoadingMarkAsDelivered || !cart || cart.length === 0 || isBlockButtons}
                     onClick={onOpen}
                     aria-label='top'
                     borderRadius='50%'
@@ -776,6 +724,11 @@ export default function DashBoard() {
                   <ModalHeader>Carrinho</ModalHeader>
                   <ModalCloseButton />
                   <Flex hidden={cart.length > 0} direction="column" w="100%">
+                    <Stack direction="column" mb="10px" spacing="10px" align="center" color={greenIcon} justifyContent="center" alignItems="center">
+                      <Text align="center" fontWeight="bold">
+                        Pedido entregue com sucesso.
+                      </Text>
+                    </Stack>
                     <Stack direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
                       <Text align="center" fontWeight="bold">
                         Carrinho vazio
@@ -783,84 +736,114 @@ export default function DashBoard() {
                     </Stack>
                   </Flex>
                   <ModalBody pb={6}>
-                    {Array.isArray(cart) &&
-                      cart.map((cart, index) => (
-
-                        <Flex key={index} justifyContent="center" alignItems="center" w="100%" >
-                          <Flex direction="column" align="center" me="auto">
-                            <Text color={textColor} fontSize="md" me="6px" fontWeight="700">
-                              {cart.name}
-                            </Text>
-                          </Flex>
-                          <SimpleGrid row={1} mr="40px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
-                            <Select
-                              isDisabled={cart.amount <= 0}
-                              fontSize="sm"
-                              id="quantity"
-                              variant="main"
-                              h="44px"
-                              maxH="44px"
-                              maxW="100px"
-                              fontWeight="400"
-                              onChange={(e) => handleOptionChange(index, e.target.value)}
-                              value={cart.quantity}
-                            >
-                              {options.map((option) => (
-                                <option key={option} value={option}>
-                                  {option}
-                                </option>
-                              ))}
-                            </Select>
-                          </SimpleGrid>
-                          <Flex mt="10px" direction='column' align='center'>
-                            <IconButton
-                              aria-label='transfer'
-                              borderRadius='50%'
-                              bg={bgIconButton}
-                              _hover={bgIconHover}
-                              _active={bgIconFocus}
-                              _focus={bgIconFocus}
-                              w='56px'
-                              h='56px'
-                              mb='5px'
-                              boxShadow={shadow}
-                              //onClick={(e) => handleStockUpdate2(index, 'update')}
-                              icon={<Icon as={MdEditSquare} color={yellowIcon} w='24px' h='24px' />} />
-                            <Text fontSize='sm' fontWeight='500' color={textColor}>
-                              Alterar
-                            </Text>
-                          </Flex>
-
-                          <Flex mt="10px" ml="20px" direction='column' align='center'>
-                            <IconButton
-                              isLoading={isLoadingButtons2[index]}
-                              aria-label='transfer'
-                              borderRadius='50%'
-                              bg={bgIconButton}
-                              _hover={bgIconHover}
-                              _active={bgIconFocus}
-                              _focus={bgIconFocus}
-                              w='56px'
-                              h='56px'
-                              mb='5px'
-                              boxShadow={shadow}
-                              onClick={(e) => handleDeleteCartItem(index)}
-                              icon={<Icon as={MdClose} color={redIcon} w='24px' h='24px' />} />
-                            <Text fontSize='sm' fontWeight='500' color={textColor}>
-                              Deletar
-                            </Text>
-                          </Flex>
-
+                    {Array.isArray(cart) && cart.map((cartItem, index) => (
+                      <Flex key={index} justifyContent="center" alignItems="center" w="100%">
+                        <Flex direction="column" align="center" me="auto">
+                          <Text color={textColor} fontSize="md" me="6px" fontWeight="700">
+                            {cartItem.stockName}
+                          </Text>
                         </Flex>
-                      ))}
+                        <SimpleGrid row={1} mr="40px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                          <Select
+                            isDisabled={cartItem.amount <= 0}
+                            fontSize="sm"
+                            id="quantity"
+                            variant="main"
+                            h="44px"
+                            maxH="44px"
+                            maxW="100px"
+                            fontWeight="400"
+                            onChange={(e) => handleOptionChange(index, e.target.value)}
+                            value={cartItem.quantity}
+                          >
+                            {options.map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                          </Select>
+                        </SimpleGrid>
+                        <Flex mt="10px" direction='column' align='center'>
+                          <IconButton
+                            aria-label='transfer'
+                            borderRadius='50%'
+                            bg={bgIconButton}
+                            _hover={bgIconHover}
+                            _active={bgIconFocus}
+                            _focus={bgIconFocus}
+                            w='56px'
+                            h='56px'
+                            mb='5px'
+                            boxShadow={shadow}
+                            //onClick={(e) => handleStockUpdate2(index, 'update')}
+                            icon={<Icon as={MdEditSquare} color={yellowIcon} w='24px' h='24px' />} />
+                          <Text fontSize='sm' fontWeight='500' color={textColor}>
+                            Alterar
+                          </Text>
+                        </Flex>
+
+                        <Flex mt="10px" ml="20px" direction='column' align='center'>
+                          <IconButton
+                            isLoading={isLoadingButtons2[index]}
+                            aria-label='transfer'
+                            borderRadius='50%'
+                            bg={bgIconButton}
+                            _hover={bgIconHover}
+                            _active={bgIconFocus}
+                            _focus={bgIconFocus}
+                            w='56px'
+                            h='56px'
+                            mb='5px'
+                            boxShadow={shadow}
+                            onClick={(e) => handleDeleteCartItem(index)}
+                            icon={<Icon as={MdClose} color={redIcon} w='24px' h='24px' />} />
+                          <Text fontSize='sm' fontWeight='500' color={textColor}>
+                            Deletar
+                          </Text>
+                        </Flex>
+
+
+                      </Flex>
+                    ))}
+                    <Flex hidden={cart.length === 0} mt="20px" gap="10px" direction='row' align='center' justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                      <Text fontSize="xl" fontWeight="bold">
+                        Total:
+                        <Badge ml="1" fontSize="0.8em" colorScheme="green">
+                          €{calculateTotalPrice(cart)}
+                        </Badge>
+                      </Text>
+                      <SimpleGrid row={1} mr="40px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                        <Select
+                          fontSize="sm"
+                          id="quantity"
+                          variant="main"
+                          h="44px"
+                          maxH="44px"
+                          maxW="100px"
+                          fontWeight="400"
+                          value={calculateTotalPrice(cart)}
+                        >
+                          {Array.from({ length: 150 }, (_, i) => (i + 1) * 10)
+                            .filter((price) => price <= 1500)
+                            .map((price) => (
+                              <option key={price} value={price}>
+                                {price}
+                              </option>
+                            ))}
+                        </Select>
+
+                      </SimpleGrid>
+                    </Flex>
                   </ModalBody>
+
                   <ModalFooter>
-                    <Button 
-                    onClick={(e) => handleCloseCart()}
-                    isDisabled={cart.length === 0} colorScheme="brand" mr={3}>
+                    <Button
+                      onClick={(e) => handleCloseCart()}
+                      isLoading={isCartProcess}
+                      isDisabled={cart.length === 0 || isCartProcess} colorScheme="green" mr={3}>
                       Entregar
                     </Button>
-                    <Button onClick={onClose}>Fechar</Button>
+                    <Button colorScheme="red" onClick={onClose}>Fechar</Button>
                   </ModalFooter>
                 </ModalContent>
               </Modal>
