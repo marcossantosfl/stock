@@ -179,7 +179,7 @@ export default function DashBoard() {
           setIsLoadingMarkAsDelivered(false);
           setCart([])
           setCartProcess(false);
-        }, 1000);
+        }, 300);
 
       }
     } catch (error) {
@@ -187,7 +187,7 @@ export default function DashBoard() {
       setTimeout(() => {
         setIsLoadingMarkAsDelivered(false);
         setCartProcess(false);
-      }, 1000);
+      }, 300);
     }
   };
 
