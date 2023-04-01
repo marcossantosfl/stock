@@ -92,45 +92,26 @@ export default function AuthNavbar(props: {
   
   const linksAuth = (
     <HStack display={{ sm: 'none', lg: 'flex' }} spacing="20px">
-      {!userId && (
-      <Stack
-        direction="row"
-        spacing="4px"
-        alignItems="center"
-        color="#fff"
-        fontWeight="bold"
-        cursor="pointer"
-        position="relative"
-      >
-                <Link
-          href='/auth/sign-in/centered'
-          style={{ maxWidth: 'max-content' }}
+      {routes.map((route) => (
+        <Stack
+          key={route.path}
+          direction="row"
+          spacing="4px"
+          alignItems="center"
+          color="#fff"
+          fontWeight="bold"
+          cursor="pointer"
+          position="relative"
         >
-        <Text fontSize="sm" color={mainText}>
-        Acessar Minha Conta
-        </Text>
-        </Link>
-      </Stack>
-       )}
-      {userId && (
-      <Stack
-        direction="row"
-        spacing="4px"
-        alignItems="center"
-        color="#fff"
-        fontWeight="bold"
-        cursor="pointer"
-        position="relative"
-      >
-        <Link href="#" onClick={handleLogout} style={{ maxWidth: 'max-content' }}>
-          <Text fontSize="sm" color={mainText}>
-            Deslogar
-          </Text>
-        </Link>
-      </Stack>
-    )}
+          <Link href={route.path} style={{ maxWidth: 'max-content' }}>
+            <Text fontSize="sm" color={mainText}>
+              {route.name}
+            </Text>
+          </Link>
+        </Stack>
+      ))}
     </HStack>
-  );
+  );  
 
   return (
     <SidebarContext.Provider value={{ sidebarWidth }}>
@@ -161,24 +142,6 @@ export default function AuthNavbar(props: {
             <SidebarResponsive routes={routes} />
           </Box>
           {linksAuth}
-          {!userId && (
-          <Link href="/auth/sign-up/centered">
-            <Button
-              bg={bgButton}
-              color={colorButton}
-              fontSize="xs"
-              variant="no-effects"
-              borderRadius="50px"
-              px="45px"
-              display={{
-                sm: 'none',
-                lg: 'flex',
-              }}
-            >
-              Cadastrar
-            </Button>
-          </Link>
-          )}
         </Flex>
       </Flex>
     </SidebarContext.Provider>
