@@ -360,7 +360,7 @@ export default function DashBoard() {
 
       if (response.data.message === 'Cart item deleted successfully') {
         await Promise.all([
-          new Promise(resolve => setTimeout(resolve, 1000)),
+          new Promise(resolve => setTimeout(resolve, 300)),
           new Promise<void>(resolve => setTimeout(() => {
             setIsLoadingButtons2(prev => {
               const copy = [...prev];
@@ -385,7 +385,7 @@ export default function DashBoard() {
             setIsBlockButtons(false);
 
             resolve();
-          }, 1000))
+          }, 300))
         ]);
       }
     } catch (error) {
@@ -397,7 +397,7 @@ export default function DashBoard() {
           return copy;
         });
         setIsBlockButtons(false);
-      }, 1000);
+      }, 300);
     }
   };
 
@@ -430,7 +430,7 @@ export default function DashBoard() {
       const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/update`, data, { headers });
       if (response.data.message === 'Cart item updated successfully') {
         await Promise.all([
-          new Promise(resolve => setTimeout(resolve, 1000)),
+          new Promise(resolve => setTimeout(resolve, 300)),
           new Promise<void>(resolve => setTimeout(() => {
             setIsLoadingButtons1(prev => {
               const copy = [...prev];
@@ -466,7 +466,7 @@ export default function DashBoard() {
             // ...
 
             resolve();
-          }, 1000))
+          }, 300))
         ]);
 
 
@@ -486,7 +486,7 @@ export default function DashBoard() {
           copy[index] = false;
           return copy;
         });
-      }, 1000);
+      }, 300);
     }
   };
 
@@ -738,20 +738,22 @@ export default function DashBoard() {
                   <ModalBody pb={6}>
                     {Array.isArray(cart) && cart.map((cartItem, index) => (
                       <Flex key={index} justifyContent="center" alignItems="center" w="100%">
-                        <Flex direction="column" align="center" me="auto">
-                          <Text color={textColor} fontSize="md" me="6px" fontWeight="700">
+                        <Flex direction="column" align="center" me="auto" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                          <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="blue">
                             {cartItem.stockName}
-                          </Text>
+                          </Badge>
                         </Flex>
-                        <SimpleGrid row={1} mr="40px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+           
                           <Select
+                            mr="10px"
                             isDisabled={cartItem.amount <= 0}
                             fontSize="sm"
                             id="quantity"
                             variant="main"
+                            w="100%"
                             h="44px"
                             maxH="44px"
-                            maxW="100px"
+                            maxW="80px"
                             fontWeight="400"
                             onChange={(e) => handleOptionChange(index, e.target.value)}
                             value={cartItem.quantity}
@@ -762,7 +764,7 @@ export default function DashBoard() {
                               </option>
                             ))}
                           </Select>
-                        </SimpleGrid>
+          
                         <Flex mt="10px" direction='column' align='center'>
                           <IconButton
                             aria-label='transfer'
