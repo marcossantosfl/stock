@@ -8,7 +8,7 @@ import { IRoute } from 'types/navigation';
 
 const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
 
-const routes: IRoute[] = !userId ? [
+const routes: IRoute[] = userId ? [
   {
     name: 'Logout',
     path: '/logout',
