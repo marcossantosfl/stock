@@ -126,7 +126,7 @@ export default function DashBoard() {
       setisChanging(true);
       setIsBlockButtons(true);
       const response = await fetch(
-        `http://localhost:8080/api/auth/stocks/${userId}/${id}/${stocks[index].amount}`,
+        `https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}/${id}/${stocks[index].amount}`,
         {
           method: "PUT",
           headers: {
