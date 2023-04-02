@@ -207,7 +207,7 @@ export default function DashBoard() {
 
   };
 
-  const handleChange= async () => {
+  const handleChange = async () => {
     if (isLoadingChange) {
       return;
     }
@@ -673,7 +673,7 @@ export default function DashBoard() {
                 <Flex direction='column' align='center'>
                   <IconButton
                     isLoading={isLoadingReset}
-                    isDisabled={isLoadingReset || isBlockButtons || isLoadingChange}
+                    isDisabled={isLoadingReset || isBlockButtons || isLoadingChange || cart.length > 0}
                     onClick={() => handleEndDay()}
                     aria-label='top'
                     borderRadius='50%'
@@ -777,7 +777,7 @@ export default function DashBoard() {
                       <Text fontSize="xl" fontWeight="bold">
                         Total:
                         <Badge ml="1" fontSize="0.8em" colorScheme="green">
-                          €{calculateTotalPrice(cart)}
+                          €{selectedPrice !== 0 ? selectedPrice : calculateTotalPrice(cart)}
                         </Badge>
                       </Text>
                       <SimpleGrid row={1} mr="40px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">

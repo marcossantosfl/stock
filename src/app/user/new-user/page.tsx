@@ -23,6 +23,7 @@
 
 // Chakra imports
 import {
+  Badge,
   Button,
   Flex,
   FormLabel,
@@ -38,16 +39,14 @@ import {
 import InputField from 'components/fields/InputField';
 import React, { useEffect, useState } from 'react';
 import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
-import { MdAdd, MdOutlineDelete } from 'react-icons/md';
+import { MdAdd, MdDeleteForever } from 'react-icons/md';
 import { useRouter } from 'next/navigation';
-import Statistics from 'components/admin/main/account/application/MiniStatistics';
-import IconBox from 'components/icons/IconBox';
 export default function NewUser() {
 
   const router = useRouter()
 
   const textColor = useColorModeValue('secondaryGray.900', 'white');
-
+  const [selectedOptions, setSelectedOptions] = useState([]);
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
@@ -71,6 +70,34 @@ export default function NewUser() {
     }
   }, []);
 
+  useEffect(() => {
+    setTimeout(() => {
+      if (token == null) {
+        localStorage.clear();
+        router.push('/home');
+      }
+
+      fetch(`https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks/${userId}`, {
+        headers: {
+          "Accept": 'application/json',
+          "x-access-token": token
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.stocks) {
+            if(data.stocks?.length > 0)
+            {
+              router.push('/user/dashboard');
+            }
+          }
+          })
+        .catch(err => {
+          console.error(err);
+        });
+    }, 100);
+  }, [userId]);
+
   const yellowIcon = useColorModeValue('yellow.500', 'white');
   const bgIconButton = useColorModeValue('white', 'whiteAlpha.100');
   const bgIconHover = useColorModeValue({ bg: 'secondaryGray.400' }, { bg: 'whiteAlpha.50' });
@@ -84,7 +111,7 @@ export default function NewUser() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIisSubmitted] = useState(false);
   const [selectedOption, setSelectedOption] = useState("1");
-  const options = Array.from({ length: 100 }, (_, i) => `${i + 1}`);
+  const options = Array.from({ length: 500 }, (_, i) => `${i + 1}`);
 
   // Chakra Color Mode
 
@@ -102,14 +129,13 @@ export default function NewUser() {
 
   const handleAddStock = () => {
 
-    if(isLoading)
-    {
+    if (isLoading) {
       return;
     }
 
     setIsLoading(true);
     if (!currentStock || currentAmount <= 0 || Number(selectedOption) <= 0) {
-      setError("You must fill the fields");
+      setError("Você precisa preencher os campos");
       setIsLoading(false);
       return;
     }
@@ -133,16 +159,16 @@ export default function NewUser() {
     if (isSubmitted) {
       return;
     }
-  
+
     setIisSubmitted(true);
     setErrorRequest('');
-  
+
     if (!stocks || stocks.length === 0) {
-      setError('You must add at least one stock');
+      setError('Você precisa adicionar ao menos um produto');
       setIisSubmitted(false);
       return;
     }
-  
+
     try {
       const response = await fetch('https://api-stock-23gsh.ondigitalocean.app/api/auth/stocks', {
         method: 'POST',
@@ -155,24 +181,33 @@ export default function NewUser() {
           userId: userId,
         }),
       });
-  
+
       const data = await response.json();
       if (!response.ok) {
         throw new Error('Failed to create stocks');
       }
-  
+
       setTimeout(() => {
         router.push('/user/dashboard');
       }, 1000);
     } catch (error) {
       console.log(error);
       setTimeout(() => {
-        setErrorRequest('Fail to create a stock.');
+        setErrorRequest('Falha ao salvar, entre em contato.');
         setIisSubmitted(false);
       }, 1000);
     }
   };
-  
+
+  const handleOptionChange2 = (index, value) => {
+    setSelectedOptions(prev => {
+      const copy = [...prev];
+      copy[index] = value;
+      return copy;
+    });
+
+    stocks[index].amount = value;
+  };
 
   return (
     <CenteredAuth
@@ -193,19 +228,19 @@ export default function NewUser() {
         <Flex direction="column" w="100%">
           <Stack direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
             <Text align="center" fontWeight="bold">
-              Create a new stock
+              Adicionar Produto
             </Text>
             <SimpleGrid row={{ base: 1, md: 2 }} gap="2px" justifyContent="center" alignItems="center">
               <InputField
-                label='Name of product'
+                label='Nome'
                 mb="10px"
-                placeholder="Tomato"
+                placeholder="14Miligramas"
                 type="text"
                 align="center"
                 onChange={handleInput}
                 value={currentStock} />
               <InputField
-                label='Price of the product'
+                label='Preço'
                 placeholder="50€"
                 mb="10px"
                 type="text"
@@ -214,13 +249,13 @@ export default function NewUser() {
                 value={currentAmount} />
               <FormLabel
                 ms="10px"
-                htmlFor="quantity"
+                htmlFor="quantidade"
                 fontSize="sm"
                 color={textColor}
                 fontWeight="bold"
                 _hover={{ cursor: 'pointer' }}
               >
-                Quantity
+                Quantidade
               </FormLabel>
               <Select
                 fontSize="sm"
@@ -261,36 +296,80 @@ export default function NewUser() {
                 <Icon as={MdAdd} color={yellowIcon} w='24px' h='24px' />
               }
             />
+            {Array.isArray(stocks) &&
+              stocks.map((stock, index) => (
+                <SimpleGrid key={index} columns={3} gap="10px" mt="30px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
 
-            {stocks.length > 0 && (
-              <Text align="center" fontWeight="bold">Stocks added</Text>
-            )}
-            {stocks.map((stock, index) => (
-              <><Statistics
-                focused={true}
-                bg="linear-gradient(135deg, #868CFF 0%, #4318FF 100%)"
-                title={`€${stock.value}`}
-                value={stock.name}
-                detail={<Flex align="center">
-                  <Text color="white" fontSize="sm" fontWeight="500">
-                    You have {stock.amount} left.
-                  </Text>
-                  <Text color="white" fontSize="sm" fontWeight="500">
-                    - Total: €{stock.amount * stock.value}
-                  </Text>
-                </Flex>}
-                illustration={<IconBox
-                  onClick={() => handleDeleteStock(index)}
-                  ml="20px"
-                  w="80px"
-                  h="80px"
-                  bg="linear-gradient(290.56deg, #868CFF -18.35%, #4318FF 60.45%)"
-                  icon={<Icon
-                    as={MdOutlineDelete}
-                    w="38px"
-                    h="38px"
-                    color="white" />} />} /></>
-            ))}
+                  <Flex direction='column' justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
+                    <Text color={textColor} fontSize='md' me='6px' fontWeight='700'>
+                      {stock.name}
+                    </Text>
+                    <Badge ml="1" fontSize="sm" colorScheme="green">
+                      Qt: {stock.amount}
+                    </Badge>
+                    <Badge mt="4px" ml="1" fontSize="sm" colorScheme="purple">
+                      Valor: €{stock.value}
+                    </Badge>
+                  </Flex>
+
+
+                  <Flex
+                    direction="column"
+                    align="center"
+                    alignContent="center"
+                    justifyContent="center"
+                    alignItems="center"
+                    textAlign="center"
+                    justifyItems="center"
+                    w="100%"
+                  >
+                    <Select
+                      isDisabled={stock.amount <= 0}
+                      ml="10px"
+                      fontSize="sm"
+                      id="quantity"
+                      variant="main"
+                      h="44px"
+                      maxH="44px"
+                      fontWeight="400"
+                      onChange={(e) => handleOptionChange2(index, e.target.value)}
+                      value={stock.amount}
+                    >
+                      {Array.from({ length: 500 }, (_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
+                    </Select>
+                  </Flex>
+
+
+                  <Flex ml="20px" direction='column' align='center'>
+                    <IconButton
+                      //isDisabled={stock.amount <= 0 || isLoadingButtons1[index] || isBlockButtons}
+                      //isLoading={isLoadingButtons1[index]}
+                      aria-label='transfer'
+                      borderRadius='50%'
+                      bg={bgIconButton}
+                      _hover={bgIconHover}
+                      _active={bgIconFocus}
+                      _focus={bgIconFocus}
+                      w='56px'
+                      h='56px'
+                      mb='5px'
+                      boxShadow={shadow}
+                      onClick={(e) => handleDeleteStock(index)}
+                      icon={
+                        <Icon as={MdDeleteForever} color={'red.400'} w='24px' h='24px' />
+                      } />
+                    <Text fontSize='sm' fontWeight='500' color={textColor}>
+                      Deletar
+                    </Text>
+                  </Flex>
+                </SimpleGrid>
+
+
+              ))}
           </Stack>
           {errorRequest && (
             <FormLabel mt="10px" fontSize="sm" textAlign="center" color="red.500">
@@ -307,7 +386,7 @@ export default function NewUser() {
               fontWeight="500"
               onClick={() => handleSubmit()}
             >
-              Create now
+              Salvar
             </Button>
           </Flex>
         </Flex>
