@@ -23,43 +23,61 @@
 
 // Chakra imports
 import {
-  Flex,
   Text,
-  SimpleGrid,
   useColorModeValue,
   Spinner,
   IconButton,
   Button,
   Icon,
-  Box,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
+  Flex,
+  Stack,
+  Alert,
+  AlertDescription,
+  AlertIcon,
+  AlertTitle,
 } from '@chakra-ui/react';
 // Custom components
 import React, { useEffect, useState } from 'react';
 import CenteredAuth from 'components/auth/variants/CenteredAuthLayout/page';
-import { MdOutlineEuroSymbol } from 'react-icons/md';
+import { MdPayment, MdSettingsBackupRestore } from 'react-icons/md';
 import Card from 'components/card/Card';
 import axios from 'axios';
-import MiniStatistics from 'components/card/MiniStatistics';
-import IconBox from 'components/icons/IconBox';
 import { useRouter } from 'next/navigation';
 
 export default function DashBoard() {
 
   const router = useRouter();
+  const { isOpen, onOpen, onClose } = useDisclosure()
   const [isLoading, setIsLoading] = useState(true);
   const [IsBackLoading, setIsBackLoading] = useState(false);
+  const [isCloseDay, setisCloseDay] = useState(false);
+  const [isCloseDaySuccess, setisCloseDaySuccess] = useState(false);
+  const [isnoBills, setnoBills] = useState(false);
   const [bill, setBill] = useState(null);
-  const boxBg = useColorModeValue('secondaryGray.300', 'whiteAlpha.100');
-  const brandColor = useColorModeValue('brand.500', 'white');
-
+  const balanceBg = useColorModeValue('brand.900', '#1B254B');
+  const redIcon = useColorModeValue('red.500', 'white');
+  const yellowIcon = useColorModeValue('yellow.500', 'white');
+  const greenIcon = useColorModeValue('green.500', 'white');
+  const bgIconButton = useColorModeValue('white', 'whiteAlpha.100');
+  const bgIconHover = useColorModeValue({ bg: 'secondaryGray.400' }, { bg: 'whiteAlpha.50' });
+  const bgIconFocus = useColorModeValue({ bg: 'white' }, { bg: 'whiteAlpha.100' });
+  const shadow = useColorModeValue('18px 17px 40px 4px rgba(112, 144, 176, 0.1)', 'unset');
+  const textColor = useColorModeValue('secondaryGray.900', 'white');
   const userId = typeof localStorage !== 'undefined' ? JSON.parse(localStorage.getItem('userId')) : null;
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
 
   useEffect(() => {
     setIsLoading(true);
 
-    if(token == null)
-    {
+    if (token == null) {
       localStorage.clear();
       router.push('/home');
     }
@@ -68,17 +86,20 @@ export default function DashBoard() {
       try {
         const headers = {
           "x-access-token": token,
-          "Accept" : 'application/json',
+          "Accept": 'application/json',
         };
         const response = await axios.get(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
         setBill(response.data.bill);
-        if (response.data.bill.end) {
-          //router.push('/user/end-bill');
-        }
-        setIsLoading(false);
+        setTimeout(() => {
+
+          setIsLoading(false);
+        }, 300);
       } catch (error) {
         console.error(error);
-        setIsLoading(false);
+        setTimeout(() => {
+
+          setIsLoading(false);
+        }, 300);
       }
     };
 
@@ -95,7 +116,7 @@ export default function DashBoard() {
 
         router.push('/user/dashboard');
 
-      }, 1000);
+      }, 300);
 
 
     } catch (error) {
@@ -103,10 +124,49 @@ export default function DashBoard() {
     }
   };
 
+  const handleCloseDay = async () => {
+
+    if (isCloseDay) {
+      return;
+    }
+
+    setisCloseDay(true);
+
+    try {
+      const headers = {
+        "x-access-token": token,
+        "Accept": 'application/json',
+      };
+      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}/close/day`, {}, { headers });
+      if (response.data.message === 'Bill day closed successfully') {
+        setTimeout(() => {
+          setisCloseDaySuccess(true);
+
+          setTimeout(() => {
+            router.push('/user/dashboard');
+          }, 800);
+        }, 300);
+
+      }
+      else if(response.data.error == 'No bills found to close')
+      {
+        setnoBills(true);
+        setisCloseDay(false);
+      }
+    } catch (error: any) {
+      onOpen();
+      setTimeout(() => {
+        setisCloseDaySuccess(false);
+        setisCloseDay(false);
+        setnoBills(false);
+      }, 300);
+    }
+  };
+
   return (
     <>
       {isLoading ? (
-          <CenteredAuth
+        <CenteredAuth
           image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
           cardTop={{ base: '140px', md: '14vh' }}
           cardBottom={{ base: '50px', lg: '100px' }}
@@ -124,17 +184,10 @@ export default function DashBoard() {
             flexDirection="column"
           >
             <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
-            <Text mb="36px"
-              ms="4px"
-              color="white"
-              fontWeight="400"
-              fontSize="lg" textAlign='center'>
-              Loading...
-            </Text>
           </Flex>
         </CenteredAuth>
       ) : (
-        <CenteredAuth
+        <><CenteredAuth
           image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
           cardTop={{ base: '140px', md: '24vh' }}
           cardBottom={{ base: '50px', lg: 'auto' }}
@@ -150,104 +203,168 @@ export default function DashBoard() {
             px={{ base: '25px', md: '0px' }}
             flexDirection="column"
           >
-            <Card p="30px">
-              <SimpleGrid row={3} gap="10px" mb="10px" alignItems="center" alignContent="center" justifyContent="center" justifyItems="center">
 
-                <MiniStatistics
-                  startContent={
-                    <IconBox
-                      w="56px"
-                      h="56px"
-                      bg={boxBg}
-                      icon={
-                        <Icon
-                          w="32px"
-                          h="32px"
-                          as={MdOutlineEuroSymbol}
-                          color={brandColor}
-                        />
-                      }
-                    />
-                  }
-                  name="Your Earnings"
-                  value={`€${bill.earn}`}
-                />
+            <Card flexDirection="column" w="100%">
+              <Flex hidden={isCloseDaySuccess}
+                justify="space-between"
+                p="20px"
+                mb="20px"
+                borderRadius="16px"
+                bgColor={balanceBg}
+                bgPosition="right"
+                bgSize="cover"
+              >
+                <Flex align="center" justify="space-between" w="100%">
+                  <Flex flexDirection="column" me="20px">
+                    <Text color="white" fontSize="sm" fontWeight="500">
+                      Ganhos
+                    </Text>
+                    <Text
+                      color="white"
+                      fontSize="34px"
+                      fontWeight="700"
+                      lineHeight="100%"
+                    >
+                      {`€${bill.earn}`}
+                    </Text>
+                  </Flex>
+                </Flex>
+              </Flex>
 
+              <Flex hidden={isCloseDaySuccess}
+                justify="space-between"
+                p="20px"
+                mb="20px"
+                borderRadius="16px"
+                bgColor={balanceBg}
+                bgPosition="right"
+                bgSize="cover"
+              >
+                <Flex align="center" justify="space-between" w="100%">
+                  <Flex flexDirection="column" me="20px">
+                    <Text color="white" fontSize="sm" fontWeight="500">
+                      A Pagar
+                    </Text>
+                    <Text
+                      color="white"
+                      fontSize="34px"
+                      fontWeight="700"
+                      lineHeight="100%"
+                    >
+                      {`€${bill.toPay.toFixed(2)}`}
+                    </Text>
+                  </Flex>
+                </Flex>
+              </Flex>
 
-                <MiniStatistics
-                  startContent={
-                    <IconBox
-                      w="56px"
-                      h="56px"
-                      bg={boxBg}
-                      icon={
-                        <Icon
-                          w="32px"
-                          h="32px"
-                          as={MdOutlineEuroSymbol}
-                          color={brandColor}
-                        />
-                      }
-                    />
-                  }
-                  name="System Bill"
-                  value={`€${bill.toPay.toFixed(2)}`}
-                />
+              <Flex hidden={isCloseDaySuccess}
+                justify="space-between"
+                p="20px"
+                mb="20px"
+                borderRadius="16px"
+                bgColor={balanceBg}
+                bgPosition="right"
+                bgSize="cover"
+              >
+                <Flex align="center" justify="space-between" w="100%">
+                  <Flex flexDirection="column" me="20px">
+                    <Text color="white" fontSize="sm" fontWeight="500">
+                      Sistema
+                    </Text>
+                    <Text
+                      color="white"
+                      fontSize="34px"
+                      fontWeight="700"
+                      lineHeight="100%"
+                    >
+                      {`€${0}`}
+                    </Text>
+                  </Flex>
+                </Flex>
+              </Flex>
 
-                <MiniStatistics
-                  startContent={
-                    <IconBox
-                      w="56px"
-                      h="56px"
-                      bg={boxBg}
-                      icon={
-                        <Icon
-                          w="32px"
-                          h="32px"
-                          as={MdOutlineEuroSymbol}
-                          color={brandColor}
-                        />
-                      }
-                    />
-                  }
-                  name="Stock To Pay"
-                  value={`€${bill.toPayTotal}`}
-                />
-              </SimpleGrid>
+              <Flex hidden={!isCloseDaySuccess} mt="10px" direction='column' align='center'>
+                <Alert status="success">
+                  <AlertIcon />
+                  <AlertTitle mr={2}>Successo</AlertTitle>
+                  <AlertDescription>redirecionando...</AlertDescription>
+                </Alert>
+                <Spinner size="lg" m="auto" mt="20px" display="block" color='green.400' zIndex="10" mb="36px" />
+              </Flex>
 
-              <Flex gap="10px" mb="10px" alignItems="center" alignContent="center" justifyContent="center" justifyItems="center">
-                <Button
-                  isLoading={IsBackLoading}
-                  isDisabled={IsBackLoading}
-                  mb="10px"
-                  mt="20px"
-                  onClick={() => handleBack()}
-                  variant="brand"
-                  fontSize="14px"
-                  fontWeight="500"
-                  w="100%"
-                  h="50"
-                >
-                  Back.
-                </Button>
-                <Button
-                  //isLoading={IsBackLoading}
-                  isDisabled={IsBackLoading}
-                  mb="10px"
-                  mt="20px"
-                  //onDoubleClick={() => handleEndDay()}
-                  variant="brand"
-                  fontSize="14px"
-                  fontWeight="500"
-                  w="100%"
-                  h="50"
-                >
-                  Pay.
-                </Button>
+              <Flex hidden={!isnoBills} mt="10px" direction='column' align='center'>
+                <Alert status="warning">
+                  <AlertIcon />
+                  <AlertTitle mr={2}>Sem contas a pagar.</AlertTitle>
+                </Alert>
+              </Flex>
+
+              <Flex hidden={isCloseDaySuccess}  justifyContent="space-around" alignItems="center" w="100%">
+                <Flex mt="10px" ml="20px" direction='column' align='center'>
+                  <IconButton
+                    isLoading={IsBackLoading}
+                    isDisabled={IsBackLoading || isCloseDay}
+                    aria-label='transfer'
+                    borderRadius='50%'
+                    bg={bgIconButton}
+                    _hover={bgIconHover}
+                    _active={bgIconFocus}
+                    _focus={bgIconFocus}
+                    w='56px'
+                    h='56px'
+                    mb='5px'
+                    boxShadow={shadow}
+                    onClick={() => handleBack()}
+                    icon={<Icon as={MdSettingsBackupRestore} color={yellowIcon} w='24px' h='24px' />} />
+                  <Text fontSize='sm' fontWeight='500' color={textColor}>
+                    Voltar
+                  </Text>
+                </Flex>
+
+                <Flex mt="10px" ml="20px" direction='column' align='center'>
+                  <IconButton
+                    isLoading={isCloseDay}
+                    isDisabled={IsBackLoading || isCloseDay}
+                    aria-label='transfer'
+                    borderRadius='50%'
+                    bg={bgIconButton}
+                    _hover={bgIconHover}
+                    _active={bgIconFocus}
+                    _focus={bgIconFocus}
+                    w='56px'
+                    h='56px'
+                    mb='5px'
+                    boxShadow={shadow}
+                    onClick={() => handleCloseDay()}
+                    icon={<Icon as={MdPayment} color={greenIcon} w='24px' h='24px' />} />
+                  <Text fontSize='sm' fontWeight='500' color={textColor}>
+                    Pagar
+                  </Text>
+                </Flex>
               </Flex>
             </Card>
           </Flex>
         </CenteredAuth>
+          <Modal closeOnOverlayClick={false} isCentered
+            motionPreset="slideInBottom" isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Limpar carrinho</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody pb={6}>
+                <Flex direction="column" w="100%">
+                  <Stack direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
+                    <Text color="red.300" align="center" fontWeight="bold">
+                      Você precisa limpar o seu carrinho
+                    </Text>
+                  </Stack>
+                </Flex>
+              </ModalBody>
+              <ModalFooter>
+                <Button onClick={onClose}>Fechar</Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal></>
       )}
     </>
   );

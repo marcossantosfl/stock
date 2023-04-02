@@ -62,6 +62,7 @@ export default function DashBoard() {
   const [isCartProcess, setCartProcess] = useState(false);
   const [isCartClosed, setisCartClosed] = useState(false);
   const [isLoadingReset, setIsLoadingReset] = useState(false);
+  const [isLoadingChange, setisLoadingChange] = useState(false);
   const [bill, setBill] = useState(null);
   const textColor = useColorModeValue('secondaryGray.900', 'white');
   const iconColor = useColorModeValue('brand.500', 'white');
@@ -78,6 +79,7 @@ export default function DashBoard() {
   const token = typeof localStorage !== 'undefined' ? localStorage.getItem("accessToken") : null;
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [cart, setCart] = useState([]);
+  const [selectedPrice, setSelectedPrice] = useState(0);
 
   const fetchCart = async () => {
     try {
@@ -101,7 +103,6 @@ export default function DashBoard() {
 
   useEffect(() => {
     if (isOpen) {
-      // Call your function here
       setisCartClosed(false);
     }
   }, [isOpen]);
@@ -149,10 +150,6 @@ export default function DashBoard() {
           };
           const response = await axios.get(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}`, { headers });
           setBill(response.data.bill);
-          if (response.data.bill.end) {
-            //router.push('/user/end-bill'); // Replace '/thank-you-page' with the path to your desired page
-          }
-          //end of the bill
           setIsLoading(false);
         } catch (error) {
           console.error(error);
@@ -177,7 +174,8 @@ export default function DashBoard() {
         "x-access-token": token,
         "Accept": 'application/json',
       };
-      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/close`, {}, { headers });
+      const body = selectedPrice ? { selectedPrice: selectedPrice } : {};
+      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/cart/${userId}/close`, body, { headers });
       if (response.data.message === 'Cart closed successfully') {
         // Do something after the bill has been marked as delivered
         setTimeout(() => {
@@ -203,26 +201,22 @@ export default function DashBoard() {
     }
 
     setIsLoadingReset(true);
-    try {
-      const headers = {
-        "x-access-token": token,
-        "Accept": 'application/json',
-      };
-      const response = await axios.post(`https://api-stock-23gsh.ondigitalocean.app/api/auth/bill/${userId}/close`, { action: "close" }, { headers });
-      if (response.data.message === 'Bill closed') {
-        // Do something after the bill has been marked as delivered
-        setTimeout(() => {
-          router.push('/user/end-bill');
-          //setIsLoadingReset(false);
-        }, 300);
+    setTimeout(() => {
+      router.push('/user/end-bill');
+    }, 300);
 
-      }
-    } catch (error) {
-      console.error(JSON.stringify(error));
-      setTimeout(() => {
-        setIsLoadingReset(false);
-      }, 300);
+  };
+
+  const handleChange= async () => {
+    if (isLoadingChange) {
+      return;
     }
+
+    setisLoadingChange(true);
+    setTimeout(() => {
+      router.push('/user/change');
+    }, 300);
+
   };
 
 
@@ -558,16 +552,16 @@ export default function DashBoard() {
 
                 <Stack direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
 
-                  <Badge mt="4px" ml="1" fontSize="md"  colorScheme="green">
+                  <Badge mt="4px" ml="1" fontSize="md" colorScheme="green">
                     {`Ganhos  €${bill.earn}`}
                   </Badge>
 
-                  <Badge mt="4px" ml="1" fontSize="md"  colorScheme="blue">
+                  <Badge mt="4px" ml="1" fontSize="md" colorScheme="blue">
                     {`A Pagar  €${bill.toPay}`}
                   </Badge>
 
-                  <Badge mt="4px" ml="1" fontSize="md"  colorScheme="yellow">
-                    {`Sistema  €${bill.toPayTotal.toFixed(2)}`}
+                  <Badge mt="4px" ml="1" fontSize="md" colorScheme="yellow">
+                    {`Sistema  €${0}`}
                   </Badge>
                 </Stack>
 
@@ -657,8 +651,9 @@ export default function DashBoard() {
               <SimpleGrid columns={3} gap="10px" mt="30px" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
                 <Flex direction='column' align='center'>
                   <IconButton
-                    //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingReset || isBlockButtons}
+                    isLoading={isLoadingChange}
+                    isDisabled={isLoadingReset || isBlockButtons || isLoadingChange || cart.length > 0}
+                    onClick={() => handleChange()}
                     aria-label='transfer'
                     borderRadius='50%'
                     bg={bgIconButton}
@@ -677,8 +672,8 @@ export default function DashBoard() {
                 </Flex>
                 <Flex direction='column' align='center'>
                   <IconButton
-                    //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingReset || isBlockButtons}
+                    isLoading={isLoadingReset}
+                    isDisabled={isLoadingReset || isBlockButtons || isLoadingChange}
                     onClick={() => handleEndDay()}
                     aria-label='top'
                     borderRadius='50%'
@@ -698,8 +693,7 @@ export default function DashBoard() {
                 </Flex>
                 <Flex direction='column' align='center'>
                   <IconButton
-                    //isLoading={isLoadingReset || isLoadingMarkAsDelivered}
-                    isDisabled={isLoadingReset || !cart || cart.length === 0 || isBlockButtons}
+                    isDisabled={isLoadingReset || !cart || cart.length === 0 || isBlockButtons || isLoadingChange}
                     onClick={onOpen}
                     aria-label='top'
                     borderRadius='50%'
@@ -734,7 +728,7 @@ export default function DashBoard() {
                         Pedido entregue com sucesso.
                       </Text>
                     </Stack>
-                    <Stack  hidden={cart.length > 0}  direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
+                    <Stack hidden={cart.length > 0} direction="column" spacing="10px" align="center" justifyContent="center" alignItems="center">
                       <Text align="center" fontWeight="bold">
                         Carrinho vazio
                       </Text>
@@ -744,49 +738,16 @@ export default function DashBoard() {
                     {Array.isArray(cart) && cart.map((cartItem, index) => (
                       <Flex key={index} justifyContent="center" alignItems="center" w="100%">
                         <Flex direction="column" align="center" me="auto" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" textAlign="center">
-                          <Badge mt="4px" ml="1" fontSize="0.8em" colorScheme="blue">
+                          <Badge mt="4px" ml="1" fontSize="md" colorScheme="blue">
                             {cartItem.stockName}
                           </Badge>
                         </Flex>
-           
-                          <Select
-                            mr="10px"
-                            isDisabled={cartItem.amount <= 0}
-                            fontSize="sm"
-                            id="quantity"
-                            variant="main"
-                            w="100%"
-                            h="44px"
-                            maxH="44px"
-                            maxW="80px"
-                            fontWeight="400"
-                            onChange={(e) => handleOptionChange(index, e.target.value)}
-                            value={cartItem.quantity}
-                          >
-                            {options.map((option) => (
-                              <option key={option} value={option}>
-                                {option}
-                              </option>
-                            ))}
-                          </Select>
-          
-                        <Flex mt="10px" direction='column' align='center'>
-                          <IconButton
-                            aria-label='transfer'
-                            borderRadius='50%'
-                            bg={bgIconButton}
-                            _hover={bgIconHover}
-                            _active={bgIconFocus}
-                            _focus={bgIconFocus}
-                            w='56px'
-                            h='56px'
-                            mb='5px'
-                            boxShadow={shadow}
-                            //onClick={(e) => handleStockUpdate2(index, 'update')}
-                            icon={<Icon as={MdEditSquare} color={yellowIcon} w='24px' h='24px' />} />
-                          <Text fontSize='sm' fontWeight='500' color={textColor}>
-                            Alterar
-                          </Text>
+
+
+                        <Flex justifyContent="center" alignItems="center" direction="column" align="center" justifySelf="center" justifyItems="center" alignContent="center" textAlign="center" mr="30px">
+                          <Badge mt="4px" ml="10px" fontSize="md" colorScheme="purple">
+                            {cartItem.quantity}
+                          </Badge>
                         </Flex>
 
                         <Flex mt="10px" ml="20px" direction='column' align='center'>
@@ -828,7 +789,8 @@ export default function DashBoard() {
                           maxH="44px"
                           maxW="100px"
                           fontWeight="400"
-                          value={calculateTotalPrice(cart)}
+                          value={selectedPrice !== 0 ? selectedPrice : calculateTotalPrice(cart)}
+                          onChange={(event) => setSelectedPrice(parseInt(event.target.value))}
                         >
                           {Array.from({ length: 150 }, (_, i) => (i + 1) * 10)
                             .filter((price) => price <= 1500)
