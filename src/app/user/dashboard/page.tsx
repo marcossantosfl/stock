@@ -182,6 +182,7 @@ export default function DashBoard() {
           setCart([])
           setCartProcess(false);
           setisCartClosed(true);
+          setSelectedPrice(0);
         }, 100);
 
       }
@@ -189,7 +190,8 @@ export default function DashBoard() {
       console.log(JSON.stringify(error));
       setTimeout(() => {
         setCartProcess(false);
-        setisCartClosed(false)
+        setisCartClosed(false);
+        setSelectedPrice(0);
       }, 100);
     }
   };
@@ -383,6 +385,8 @@ export default function DashBoard() {
 
             setIsBlockButtons(false);
 
+            setSelectedPrice(0);
+
             resolve();
           }, 300))
         ]);
@@ -396,6 +400,7 @@ export default function DashBoard() {
           return copy;
         });
         setIsBlockButtons(false);
+        setSelectedPrice(0);
       }, 300);
     }
   };
