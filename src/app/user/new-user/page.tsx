@@ -86,12 +86,11 @@ export default function NewUser() {
         .then(res => res.json())
         .then(data => {
           if (data.stocks) {
-            if(data.stocks?.length > 0)
-            {
+            if (data.stocks?.length > 0) {
               router.push('/user/dashboard');
             }
           }
-          })
+        })
         .catch(err => {
           console.error(err);
         });
@@ -378,9 +377,10 @@ export default function NewUser() {
           )}
           <Flex mt="20px" justify="center">
             <Button
+              colorScheme="blue"
+              variant="solid"
               isLoading={isSubmitted}
-              //isDisabled={isSubmitted || stocks.length === 0}
-              variant="brand"
+              isDisabled={isSubmitted || stocks.length === 0}
               minW="183px"
               fontSize="sm"
               fontWeight="500"

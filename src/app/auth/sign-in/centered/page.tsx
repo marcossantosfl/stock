@@ -36,6 +36,7 @@ import {
   InputGroup,
   SimpleGrid,
   Spinner,
+  Stack,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
@@ -45,7 +46,7 @@ import Link from 'components/link/Link';
 import CenteredAuth from '../../../../components/auth/variants/CenteredAuthLayout/page';
 
 // Assets
-import  { PhoneInput  } from "react-contact-number-input";
+import { PhoneInput } from "react-contact-number-input";
 import { parsePhoneNumberFromString } from 'libphonenumber-js';
 
 const SignIn = () => {
@@ -99,6 +100,7 @@ const SignIn = () => {
   };
 
   const handleLogin = async () => {
+  
     if (isLoading) {
       return;
     }
@@ -112,7 +114,7 @@ const SignIn = () => {
       setError(null);
     }
 
-   
+
 
     if (!error) {
       setErrorUser("");
@@ -195,7 +197,7 @@ const SignIn = () => {
           >
             <Box justifyContent="center" alignItems="center" justifyItems="center" alignContent="center">
               <Heading
-              textAlign="center" 
+                textAlign="center"
                 color={textColor}
                 fontSize={{ base: '34px', lg: '36px' }}
                 mb="10px"
@@ -234,7 +236,7 @@ const SignIn = () => {
                   <InputGroup size="md" textAlign="center" justifyContent="center" alignItems="center" justifyItems="center" alignContent="center" mt="10px"
                   >
                     <PhoneInput
-                   
+
                       country={'IE'}
                       onChange={(value: string) => {
                         handlePhoneNumberChange(value);
@@ -253,16 +255,16 @@ const SignIn = () => {
                   </FormLabel>
                 )}
                 <Button
-                 //_loading={{bg:blueColor}}
+                  colorScheme="blue"
+                  variant="solid"
                   mt="30px"
-                  variant="brand"
                   fontSize="14px"
                   fontWeight="500"
                   w="100%"
                   h="50"
                   mb="24px"
                   isLoading={isLoading}
-                  //isDisabled={isLoading || !isValidPhoneNumber(phoneNumber)}
+                  isDisabled={isLoading || !isValidPhoneNumber(phoneNumber)}
                   onClick={handleLogin}
                 >
                   Acessar

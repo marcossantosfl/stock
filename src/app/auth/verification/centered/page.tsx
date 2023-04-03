@@ -77,7 +77,7 @@ function ForgotPassword() {
 
     if (!userId) {
       //setTimeout(() => {
-        router.push("/home");
+      router.push("/home");
       //}, 3000);
     }
   }, [userId]);
@@ -100,8 +100,7 @@ function ForgotPassword() {
 
   const handleUnlock = async () => {
 
-    if(isLoading)
-    {
+    if (isLoading) {
       return;
     }
 
@@ -143,8 +142,7 @@ function ForgotPassword() {
 
   const handleResendCode = async () => {
 
-    if(isLoadingResend)
-    {
+    if (isLoadingResend) {
       return;
     }
 
@@ -169,7 +167,7 @@ function ForgotPassword() {
         setSuccess("Um novo codigo foi enviado para o seu celular");
         setIsLoadingResend(false);
       }, 2000);
-      
+
     } catch (error) {
       setTimeout(() => {
         setErrorResend("Falha em reenviar o codigo, tente novamente");
@@ -183,181 +181,181 @@ function ForgotPassword() {
     <>
       {isSigned ? (
         <CenteredAuth
-        image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
-        cardTop={{ base: '140px', md: '14vh' }}
-        cardBottom={{ base: '50px', lg: '100px' }}
-        showCard={true}
-        cardSx={{ bg: 'none' }}
-      >
-        <Flex
-          w="100%"
-          maxW="max-content"
-          mx={{ base: 'auto', lg: '0px' }}
-          me="auto"
-          h="100%"
-          justifyContent="center"
-          px={{ base: '25px', md: '0px' }}
-          flexDirection="column"
+          image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+          cardTop={{ base: '140px', md: '14vh' }}
+          cardBottom={{ base: '50px', lg: '100px' }}
+          showCard={true}
+          cardSx={{ bg: 'none' }}
         >
-          <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
-        </Flex>
-      </CenteredAuth>
+          <Flex
+            w="100%"
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            h="100%"
+            justifyContent="center"
+            px={{ base: '25px', md: '0px' }}
+            flexDirection="column"
+          >
+            <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
+          </Flex>
+        </CenteredAuth>
       ) : (
 
-            <CenteredAuth
-              image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
-              cardTop={{ base: '140px', md: '24vh' }}
-              cardBottom={{ base: '50px', lg: 'auto' }}
-            >
-              <Flex
-                w="100%"
-                maxW="max-content"
-                mx={{ base: 'auto', lg: '0px' }}
-                me="auto"
-                h="100%"
-                justifyContent="center"
-                px={{ base: '25px', md: '0px' }}
-                flexDirection="column"
+        <CenteredAuth
+          image={'linear-gradient(135deg, #868CFF 0%, #4318FF 100%)'}
+          cardTop={{ base: '140px', md: '24vh' }}
+          cardBottom={{ base: '50px', lg: 'auto' }}
+        >
+          <Flex
+            w="100%"
+            maxW="max-content"
+            mx={{ base: 'auto', lg: '0px' }}
+            me="auto"
+            h="100%"
+            justifyContent="center"
+            px={{ base: '25px', md: '0px' }}
+            flexDirection="column"
+          >
+            <Box me="auto" mb="34px">
+              <Heading
+                color={textColor}
+                fontSize="36px"
+                mb="16px"
+                mx={{ base: 'auto', lg: 'unset' }}
+                textAlign={{ base: 'center', lg: 'left' }}
               >
-                <Box me="auto" mb="34px">
-                  <Heading
-                    color={textColor}
-                    fontSize="36px"
-                    mb="16px"
-                    mx={{ base: 'auto', lg: 'unset' }}
-                    textAlign={{ base: 'center', lg: 'left' }}
-                  >
-                    OTP verificação
-                  </Heading>
-                  <Text
-                    color={textColorSecondary}
-                    fontSize="md"
-                    maxW={{ base: '95%', md: '100%' }}
-                    mx={{ base: 'auto', lg: 'unset' }}
-                    textAlign={{ base: 'center', lg: 'left' }}
-                  >
-                    Entre o codigo de verificação para confirmar sua conta!
-                  </Text>
-                </Box>
-                <Flex
-                  zIndex="2"
-                  direction="column"
-                  w={{ base: '100%', md: '425px' }}
-                  maxW="100%"
-                  background="transparent"
-                  borderRadius="15px"
-                  mx={{ base: 'auto', lg: 'unset' }}
-                  me="auto"
-                  mb={{ base: '20px', md: 'auto' }}
-                >
-                  <FormControl>
-                    <Flex justify="center">
-                      <PinInput otp>
-                        <PinInputField
-                          readOnly={isLoading}
-                          fontSize="36px"
-                          color={textColor}
-                          borderRadius="16px"
-                          borderColor={borderColor}
-                          h={{ base: '63px', md: '95px' }}
-                          w={{ base: '63px', md: '95px' }}
-                          me="10px"
-                          value={otpDigit1}
-                          onChange={handleOtpDigit1Change}
-                        />
-                        <PinInputField
-                          readOnly={isLoading}
-                          fontSize="36px"
-                          color={textColor}
-                          borderRadius="16px"
-                          borderColor={borderColor}
-                          h={{ base: '63px', md: '95px' }}
-                          w={{ base: '63px', md: '95px' }}
-                          me="10px"
-                          value={otpDigit2}
-                          onChange={handleOtpDigit2Change}
-                        />
-                        <PinInputField
-                          readOnly={isLoading}
-                          fontSize="36px"
-                          color={textColor}
-                          borderRadius="16px"
-                          borderColor={borderColor}
-                          h={{ base: '63px', md: '95px' }}
-                          w={{ base: '63px', md: '95px' }}
-                          me="10px"
-                          value={otpDigit3}
-                          onChange={handleOtpDigit3Change}
-                        />
-                        <PinInputField
-                          readOnly={isLoading}
-                          fontSize="36px"
-                          color={textColor}
-                          borderRadius="16px"
-                          borderColor={borderColor}
-                          h={{ base: '63px', md: '95px' }}
-                          w={{ base: '63px', md: '95px' }}
-                          value={otpDigit4}
-                          onChange={handleOtpDigit4Change}
-                        />
-                      </PinInput>
-                    </Flex>
-                    {error && (
-                      <FormLabel fontSize="sm" textAlign="center" color="red.500">
-                        {error}
-                      </FormLabel>
-                    )}
-                    <Button
-                       _loading={{bg:blueColor}}
-                      disabled={isLoading}
-                      fontSize="14px"
-                      variant="brand"
+                OTP verificação
+              </Heading>
+              <Text
+                color={textColorSecondary}
+                fontSize="md"
+                maxW={{ base: '95%', md: '100%' }}
+                mx={{ base: 'auto', lg: 'unset' }}
+                textAlign={{ base: 'center', lg: 'left' }}
+              >
+                Entre o codigo de verificação para confirmar sua conta!
+              </Text>
+            </Box>
+            <Flex
+              zIndex="2"
+              direction="column"
+              w={{ base: '100%', md: '425px' }}
+              maxW="100%"
+              background="transparent"
+              borderRadius="15px"
+              mx={{ base: 'auto', lg: 'unset' }}
+              me="auto"
+              mb={{ base: '20px', md: 'auto' }}
+            >
+              <FormControl>
+                <Flex justify="center">
+                  <PinInput otp>
+                    <PinInputField
+                      readOnly={isLoading}
+                      fontSize="36px"
+                      color={textColor}
                       borderRadius="16px"
-                      fontWeight="500"
-                      w="100%"
-                      h="50"
-                      mb="24px"
-                      mt="12px"
-                      isLoading={isLoading}
-                      onClick={handleUnlock}
-                    >
-                      Confirmar
-
-                    </Button>
-                    {errorInvalid && (
-                      <FormLabel fontSize="sm" textAlign="center" color="red.500">
-                        {errorInvalid}
-                      </FormLabel>
-                    )}
-                  </FormControl>
-                  <Flex
-                    flexDirection="column"
-                    justifyContent="center"
-                    alignItems="start"
-                    maxW="100%"
-                    mt="0px"
-                  >
-                    <Text
-                      opacity={isLoading ? 0 : 1}
-                      color={textColorDetails}
-                      fontWeight="400"
-                      fontSize="14px"
-                      mx={{ base: 'auto', lg: 'unset' }}
-                      textAlign={{ base: 'center', lg: 'left' }}
-
-                    >
-                      Não recebeu?
-
-                      <Text onClick={handleResendCode} color={textColorBrand} style={{ cursor: 'pointer' }} as="span" ms="5px" fontWeight="500">
-                        {isLoadingResend ? "Enviando..." : "Enviar novamente"}
-                      </Text>
-                      {errorResend && <Text fontSize="14px" color="red">{errorResend}</Text>}
-                      {success && <Text fontSize="14px" color="green">{success}</Text>}
-                    </Text>
-                  </Flex>
+                      borderColor={borderColor}
+                      h={{ base: '63px', md: '95px' }}
+                      w={{ base: '63px', md: '95px' }}
+                      me="10px"
+                      value={otpDigit1}
+                      onChange={handleOtpDigit1Change}
+                    />
+                    <PinInputField
+                      readOnly={isLoading}
+                      fontSize="36px"
+                      color={textColor}
+                      borderRadius="16px"
+                      borderColor={borderColor}
+                      h={{ base: '63px', md: '95px' }}
+                      w={{ base: '63px', md: '95px' }}
+                      me="10px"
+                      value={otpDigit2}
+                      onChange={handleOtpDigit2Change}
+                    />
+                    <PinInputField
+                      readOnly={isLoading}
+                      fontSize="36px"
+                      color={textColor}
+                      borderRadius="16px"
+                      borderColor={borderColor}
+                      h={{ base: '63px', md: '95px' }}
+                      w={{ base: '63px', md: '95px' }}
+                      me="10px"
+                      value={otpDigit3}
+                      onChange={handleOtpDigit3Change}
+                    />
+                    <PinInputField
+                      readOnly={isLoading}
+                      fontSize="36px"
+                      color={textColor}
+                      borderRadius="16px"
+                      borderColor={borderColor}
+                      h={{ base: '63px', md: '95px' }}
+                      w={{ base: '63px', md: '95px' }}
+                      value={otpDigit4}
+                      onChange={handleOtpDigit4Change}
+                    />
+                  </PinInput>
                 </Flex>
+                {error && (
+                  <FormLabel fontSize="sm" textAlign="center" color="red.500">
+                    {error}
+                  </FormLabel>
+                )}
+                <Button
+                  colorScheme="blue"
+                  variant="solid"
+                  disabled={isLoading}
+                  fontSize="14px"
+                  borderRadius="16px"
+                  fontWeight="500"
+                  w="100%"
+                  h="50"
+                  mb="24px"
+                  mt="12px"
+                  isLoading={isLoading}
+                  onClick={handleUnlock}
+                >
+                  Confirmar
+
+                </Button>
+                {errorInvalid && (
+                  <FormLabel fontSize="sm" textAlign="center" color="red.500">
+                    {errorInvalid}
+                  </FormLabel>
+                )}
+              </FormControl>
+              <Flex
+                flexDirection="column"
+                justifyContent="center"
+                alignItems="start"
+                maxW="100%"
+                mt="0px"
+              >
+                <Text
+                  opacity={isLoading ? 0 : 1}
+                  color={textColorDetails}
+                  fontWeight="400"
+                  fontSize="14px"
+                  mx={{ base: 'auto', lg: 'unset' }}
+                  textAlign={{ base: 'center', lg: 'left' }}
+
+                >
+                  Não recebeu?
+
+                  <Text onClick={handleResendCode} color={textColorBrand} style={{ cursor: 'pointer' }} as="span" ms="5px" fontWeight="500">
+                    {isLoadingResend ? "Enviando..." : "Enviar novamente"}
+                  </Text>
+                  {errorResend && <Text fontSize="14px" color="red">{errorResend}</Text>}
+                  {success && <Text fontSize="14px" color="green">{success}</Text>}
+                </Text>
               </Flex>
-            </CenteredAuth>
+            </Flex>
+          </Flex>
+        </CenteredAuth>
       )}
     </>
   );

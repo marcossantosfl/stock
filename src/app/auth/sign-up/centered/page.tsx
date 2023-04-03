@@ -312,7 +312,8 @@ const SignUp = () => {
                   </FormLabel>
                 )}
                 <Button
-                  variant="brand"
+                  colorScheme="blue"
+                  variant="solid"
                   fontSize="14px"
                   fontWeight="500"
                   w="100%"
