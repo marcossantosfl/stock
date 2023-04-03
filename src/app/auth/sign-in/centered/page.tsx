@@ -253,7 +253,7 @@ const SignIn = () => {
                   </FormLabel>
                 )}
                 <Button
-                 _loading={{bg:blueColor}}
+                 //_loading={{bg:blueColor}}
                   mt="30px"
                   variant="brand"
                   fontSize="14px"
@@ -262,7 +262,7 @@ const SignIn = () => {
                   h="50"
                   mb="24px"
                   isLoading={isLoading}
-                  isDisabled={isLoading || !isValidPhoneNumber(phoneNumber)}
+                  //isDisabled={isLoading || !isValidPhoneNumber(phoneNumber)}
                   onClick={handleLogin}
                 >
                   Acessar

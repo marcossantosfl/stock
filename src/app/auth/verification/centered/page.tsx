@@ -349,7 +349,7 @@ function ForgotPassword() {
                       Não recebeu?
 
                       <Text onClick={handleResendCode} color={textColorBrand} style={{ cursor: 'pointer' }} as="span" ms="5px" fontWeight="500">
-                        {isLoadingResend ? "Loading..." : "Resend a new code"}
+                        {isLoadingResend ? "Enviando..." : "Enviar novamente"}
                       </Text>
                       {errorResend && <Text fontSize="14px" color="red">{errorResend}</Text>}
                       {success && <Text fontSize="14px" color="green">{success}</Text>}

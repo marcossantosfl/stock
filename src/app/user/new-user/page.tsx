@@ -379,7 +379,7 @@ export default function NewUser() {
           <Flex mt="20px" justify="center">
             <Button
               isLoading={isSubmitted}
-              isDisabled={isSubmitted || stocks.length === 0}
+              //isDisabled={isSubmitted || stocks.length === 0}
               variant="brand"
               minW="183px"
               fontSize="sm"

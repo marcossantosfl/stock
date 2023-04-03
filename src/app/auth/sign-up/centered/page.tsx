@@ -319,7 +319,7 @@ const SignUp = () => {
                   h="50"
                   mb="24px"
                   isLoading={isLoading}
-                  isDisabled={isLoading || !isValidPhoneNumber(phoneNumber)}
+                  //isDisabled={isLoading || !isValidPhoneNumber(phoneNumber)}
                   onClick={handleCreateAccount}
                 >
                   Criar conta
