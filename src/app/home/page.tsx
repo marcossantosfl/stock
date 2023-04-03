@@ -83,7 +83,7 @@ function Home() {
             >
               Controle o seu estoque a qualquer hora em qualquer lugar.
             </Text>
-            <Link href="/auth/sign-in/centered">
+            <Link href="/auth/sign-up/centered">
             <Button
               zIndex="1"
               bg={bgButton}
@@ -94,7 +94,7 @@ function Home() {
               px="45px"
              
             >
-              Acessar
+              Criar conta
             </Button>
           </Link>
           </Flex>
