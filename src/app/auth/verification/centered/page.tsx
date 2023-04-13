@@ -197,7 +197,15 @@ function ForgotPassword() {
             px={{ base: '25px', md: '0px' }}
             flexDirection="column"
           >
-            <Spinner size="lg" m="auto" mt="100px" display="block" color='white' zIndex="10" mb="36px" />
+            <Spinner
+              size="lg"
+              m="auto"
+              mt="100px"
+              display="block"
+              color="white"
+              zIndex="10"
+              mb="36px"
+            />
           </Flex>
         </CenteredAuth>
       ) : (
